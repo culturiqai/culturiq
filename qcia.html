@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCIA: The Causal Revolution | Culturiq Research</title>
+    <meta name="description" content="An in-depth look at QCIA (Quantum Causal Inference Architecture), our patent-pending technology for building AI that understands cause and effect.">
+    <link rel="icon" href="images/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-accent: #d9ff00; /* Vibrant Lime/Chartreuse */
+            --brand-accent-light: #e5ff58;
+            --brand-text: #f0f0f0;
+            --brand-dark-bg: #0a0a0a;
+            --brand-dark-card: #111111;
+            
+            --glow-color-primary: rgba(217, 255, 0, 0.7);
+            --glow-color-secondary: rgba(217, 255, 0, 0.5);
+            --grid-color: rgba(217, 255, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--brand-dark-bg);
+            color: var(--brand-text);
+        }
+        h1, h2, h3, h4, .font-brand {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--brand-accent);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: var(--brand-accent);
+            color: var(--brand-dark-bg);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .section-title {
+           font-weight: 900;
+           letter-spacing: -0.025em;
+           font-family: 'Roboto Mono', monospace;
+        }
+        .card-border-glow {
+            position: relative;
+            background-color: var(--brand-dark-card);
+            border: 1px solid rgba(217, 255, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .card-border-glow:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 0.75rem;
+            border: 1px solid transparent;
+            background: linear-gradient(120deg, var(--glow-color-secondary), transparent, var(--glow-color-secondary)) border-box;
+            -webkit-mask:
+                linear-gradient(#fff 0 0) padding-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .card-border-glow:hover:before {
+            opacity: 1;
+        }
+        .card-border-glow:hover {
+            transform: translateY(-5px);
+            border-color: rgba(217, 255, 0, 0.4);
+            box-shadow: 0 10px 30px -15px rgba(217, 255, 0, 0.2);
+        }
+        .text-glow {
+            text-shadow: 0 0 8px rgba(217, 255, 0, 0.3), 0 0 20px rgba(217, 255, 0, 0.2);
+        }
+        .bg-grid {
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .aspect-video {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        .aspect-video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="web.html" class="text-2xl font-black text-white font-brand flex items-center">
+                <img src="images/logo.png" alt="Culturiq Logo" class="h-8 inline-block mr-2">
+                <span>cultur<span class="text-[var(--brand-accent)]">iq</span></span>
+            </a>
+            <nav class="hidden md:flex space-x-8 text-gray-300">
+                <a href="web.html#vision" class="nav-link">Vision</a>
+                <a href="web.html#technology" class="nav-link">Technology</a>
+                <a href="web.html#milestones" class="nav-link">Milestones</a>
+                <a href="web.html#labs" class="nav-link">Labs</a>
+                <a href="web.html#team" class="nav-link">Team</a>
+            </nav>
+            <a href="web.html#join-us" class="hidden md:inline-block px-6 py-2 rounded-lg btn-primary font-brand">
+                Contact
+            </a>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <!-- Hero Section -->
+        <section class="py-20 text-center relative overflow-hidden" style="height: 350px;">
+            <div id="qcia-animation-container" class="absolute inset-0 z-0 bg-black"></div>
+            <div class="container mx-auto px-6 relative z-10 flex flex-col items-center justify-center h-full">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight text-glow">
+                    <span class="text-[var(--brand-accent)]">QCIA:</span> The Causal Revolution
+                </h1>
+            </div>
+        </section>
+
+        <!-- Intro Section -->
+        <section class="pb-16 pt-16 bg-black">
+            <div class="container mx-auto px-6">
+                <p class="max-w-3xl mx-auto text-lg md:text-xl text-gray-400 text-center">Welcome to the future of artificial intelligence. QCIA, our patent-pending Quantum Causal Inference Architecture, is a fundamental reimagining of how machines learn, reason, and understand the world. Moving beyond simple statistical pattern matching, QCIA is a sense-making engine designed to learn the "why" behind the "what," enabling a new generation of safe, reliable, and truly intelligent systems.</p>
+            </div>
+        </section>
+
+        <!-- Correlation Section -->
+        <section class="py-20 bg-grid">
+            <div class="container mx-auto px-6">
+                 <div class="text-center">
+                    <h2 class="text-3xl md:text-5xl section-title text-white">From Correlation to Causation</h2>
+                    <p class="mt-6 max-w-4xl mx-auto text-lg md:text-xl text-gray-400">Today's AI systems have a fundamental flaw: they are masters of correlation, but strangers to causation. They learn to associate patterns in data without any real-world understanding, a limitation that has led to catastrophic failures. This reliance on spurious correlations is why AI can "hallucinate" facts and fail in novel situations—it is guessing based on statistics, not reasoning from first principles.</p>
+                </div>
+
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Left Panel: Statistical AI -->
+                    <div class="p-6 rounded-lg bg-black/50 border border-zinc-700">
+                        <h3 class="text-xl font-bold text-center text-red-400">Statistical AI</h3>
+                        <div id="statistical-ai-container" class="mt-4 relative" style="height: 300px;"></div>
+                    </div>
+                    <!-- Right Panel: Causal AI -->
+                    <div class="p-6 rounded-lg bg-black/50 border border-zinc-700">
+                        <h3 class="text-xl font-bold text-center text-[var(--brand-accent)]">Causal AI (QCIA)</h3>
+                        <div id="causal-ai-container" class="mt-4 relative" style="height: 300px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Manifold Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-6">
+                 <div class="lg:flex lg:items-center lg:gap-16">
+                    <!-- Left Column: Text -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-3xl md:text-5xl section-title text-[var(--brand-accent)]">The Geometric Manifold</h2>
+                        <p class="mt-6 text-lg md:text-xl text-gray-400">At the heart of QCIA is a revolutionary approach to memory and reasoning. We encode cause, action, and effect as points in a high-dimensional geometric space. As the AI gathers experience, these points form a complex, multi-dimensional surface—a geometric manifold.</p>
+                        <blockquote class="mt-8 border-l-4 border-[var(--brand-accent)] pl-6 text-xl italic text-gray-400">
+                            The "shape" of this space—its unique curvature—comes to represent the causal structure of the environment itself. To make a prediction or form a plan, the AI calculates the shortest path between two points on this surface (a geodesic). This path represents the most likely causal chain of events.
+                        </blockquote>
+                    </div>
+                    <!-- Right Column: Animation -->
+                    <div class="mt-12 lg:mt-0 lg:w-1/2">
+                        <div id="manifold-animation-container" class="rounded-lg" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Applications Section -->
+        <section class="py-20 bg-black/30">
+            <div class="container mx-auto px-6">
+                 <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl section-title text-white">Applications and Impact</h2>
+                    <p class="mt-6 text-lg md:text-xl text-gray-400 max-w-4xl mx-auto">QCIA’s ability to perform true causal reasoning unlocks transformative potential across high-stakes industries where safety, reliability, and discovery are paramount.</p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- AV Card -->
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <img src="images/QCIA_AV.jpeg" alt="AI view from a self-driving car identifying a pedestrian and braking" class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-xl font-bold text-white">Autonomous Vehicles</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">QCIA can help a self-driving car reason about novel "edge case" scenarios. By learning the causal link between actions and outcomes from simulation, it understands *why* it must stop for a child chasing a ball into the street, not just matching a pattern.</p>
+                    </div>
+                    <!-- Sci Discovery Card -->
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <img src="images/QCIA_Sci.jpeg" alt="A beam of light connecting nodes in a network, representing scientific discovery" class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-xl font-bold text-white">Scientific Discovery</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">Deployed as an "Artificial Scientist," QCIA can analyze vast experimental data to uncover hidden causal relationships in biology and physics, pushing it to resolve anomalies and generate genuinely new, testable hypotheses.</p>
+                    </div>
+                    <!-- QEC Card -->
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <img src="images/QCIA_QEC.jpeg" alt="An abstract visualization of quantum error correction" class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-xl font-bold text-white">Quantum Error Correction</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">By modeling the intricate cause-and-effect relationships that lead to decoherence in quantum systems, QCIA can be used to predict and develop strategies to mitigate errors, paving the way for more stable quantum computing.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Video Section -->
+        <section id="qcia-in-action" class="py-20">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <div class="text-center mb-12">
+                     <h2 class="text-3xl md:text-5xl section-title text-white">QCIA in Action</h2>
+                     <p class="mt-6 text-lg text-gray-400">In this QISKIT demo, the same curiosity-driven AI that discovered fire from scratch is applied to one of quantum computing's hardest challenges. Watch as it goes from zero to 50% fidelity in under 3 minutes—a task that takes statistical methods hours.</p>
+                </div>
+                 <div class="mb-12 max-w-2xl mx-auto">
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-[var(--brand-accent)] mr-3 mt-1">&#10140;</span>
+                            <div><strong class="text-white">No Black Box:</strong> Watch the AI's exact thought process as it discovers error patterns and understands *why* they occur.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[var(--brand-accent)] mr-3 mt-1">&#10140;</span>
+                            <div><strong class="text-white">Real-time Discovery:</strong> Every decision is traceable and every correction has a reason, moving beyond statistical pattern matching.</div>
+                        </li>
+                         <li class="flex items-start">
+                            <span class="text-[var(--brand-accent)] mr-3 mt-1">&#10140;</span>
+                            <div><strong class="text-white">Immediate Implementation:</strong> The system works directly with QISKIT, a leading quantum computing software stack.</div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="aspect-video rounded-xl overflow-hidden shadow-2xl shadow-black/50 border border-zinc-700">
+                    <iframe 
+                        src="https://www.youtube.com/embed/fsRjEu8rifE" 
+                        title="YouTube video player"
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Back Button Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                 <a href="web.html#technology" class="inline-block px-8 py-3 rounded-lg bg-zinc-800 text-white font-bold hover:bg-zinc-700 transition">Back to Technologies</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800">
+        <!-- ... Footer content copied from web.html for consistency ... -->
+    </footer>
+
+    <script>
+    // p5.js sketch for QCIA Hero Animation
+    function qciaHeroSketch(p) {
+        let chaoticParticles = [];
+        const numChaotic = 80;
+        let structuredNodes = [];
+        let pulses = [];
+        let coreX, coreY;
+
+        class Particle {
+            constructor() {
+                this.pos = p.createVector(p.random(0, p.width / 2.5), p.random(p.height));
+                this.vel = p5.Vector.random2D().mult(0.3);
+            }
+            update() {
+                this.pos.add(this.vel);
+                if (this.pos.x > coreX - 30 || this.pos.x < 0 || this.pos.y > p.height || this.pos.y < 0) {
+                    this.pos.set(p.random(0, p.width / 2.5), p.random(p.height));
+                }
+            }
+        }
+
+        class StructuredNode {
+            constructor(x, y) { this.pos = p.createVector(x, y); }
+            show() {
+                p.fill(217, 255, 0);
+                p.noStroke();
+                p.circle(this.pos.x, this.pos.y, 6);
+            }
+        }
+        
+        class Pulse {
+            constructor(startNode, endNode) {
+                this.start = startNode.pos.copy();
+                this.end = endNode.pos.copy();
+                this.progress = 0;
+                this.speed = 0.02;
+            }
+            update() {
+                this.progress += this.speed;
+                if(this.progress > 1) { this.progress = 0; }
+            }
+            show() {
+                let currentPos = p5.Vector.lerp(this.start, this.end, this.progress);
+                p.fill(255);
+                p.noStroke();
+                p.circle(currentPos.x, currentPos.y, 3);
+            }
+        }
+
+        p.setup = function() {
+            let container = document.getElementById('qcia-animation-container');
+            if (!container) return;
+            p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
+            coreX = p.width / 2;
+            coreY = p.height / 2;
+
+            for (let i = 0; i < numChaotic; i++) { chaoticParticles.push(new Particle()); }
+            
+            let cols = 4, rows = 5, colW = (p.width / 2.2) / cols, rowH = p.height / rows;
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    if(p.random() > 0.3) {
+                       structuredNodes.push(new StructuredNode(coreX + 60 + i * colW, j * rowH + rowH / 2));
+                    }
+                }
+            }
+            
+            for(let i=0; i < structuredNodes.length -1; i++){
+                if(p.random() > 0.5 && structuredNodes[i+1]){
+                     pulses.push(new Pulse(structuredNodes[i], structuredNodes[i+1]));
+                }
+            }
+        };
+
+        p.draw = function() {
+            p.background(10, 10, 10);
+            
+            p.stroke(217, 255, 0, 50);
+            p.strokeWeight(0.5);
+            for (let i = 0; i < chaoticParticles.length; i++) {
+                for (let j = i + 1; j < chaoticParticles.length; j++) {
+                    if (chaoticParticles[i].pos.dist(chaoticParticles[j].pos) < 60) {
+                        p.line(chaoticParticles[i].pos.x, chaoticParticles[i].pos.y, chaoticParticles[j].pos.x, chaoticParticles[j].pos.y);
+                    }
+                }
+                chaoticParticles[i].update();
+            }
+
+            p.drawingContext.shadowBlur = 24;
+            p.drawingContext.shadowColor = 'rgba(217, 255, 0, 0.5)';
+            p.fill(255);
+            p.noStroke();
+            p.circle(coreX, coreY, 15);
+            p.drawingContext.shadowBlur = 0;
+
+            p.stroke(217, 255, 0, 180);
+            p.strokeWeight(1);
+            for (let i = 0; i < structuredNodes.length; i++) {
+                p.line(coreX, coreY, structuredNodes[i].pos.x, structuredNodes[i].pos.y);
+                if (i < structuredNodes.length - 1 && structuredNodes[i].pos.dist(structuredNodes[i+1].pos) < p.height/2) {
+                    p.line(structuredNodes[i].pos.x, structuredNodes[i].pos.y, structuredNodes[i + 1].pos.x, structuredNodes[i + 1].pos.y);
+                }
+            }
+            structuredNodes.forEach(n => n.show());
+            pulses.forEach(p => { p.update(); p.show(); });
+        };
+        
+        p.windowResized = function() {
+            let container = document.getElementById('qcia-animation-container');
+            if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+            coreX = p.width / 2;
+            coreY = p.height / 2;
+
+            chaoticParticles = [];
+            structuredNodes = [];
+            pulses = [];
+            
+            for (let i = 0; i < numChaotic; i++) { chaoticParticles.push(new Particle()); }
+            
+            let cols = 4, rows = 5, colW = (p.width / 2.2) / cols, rowH = p.height / rows;
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    if(p.random() > 0.3) {
+                       structuredNodes.push(new StructuredNode(coreX + 60 + i * colW, j * rowH + rowH / 2));
+                    }
+                }
+            }
+            
+            for(let i=0; i < structuredNodes.length -1; i++){
+                if(p.random() > 0.5 && structuredNodes[i+1]){
+                     pulses.push(new Pulse(structuredNodes[i], structuredNodes[i+1]));
+                }
+            }
+        };
+    }
+    new p5(qciaHeroSketch);
+
+    // p5.js sketch for the "Tale of Two AIs" visualization
+    function twoAIsSketch(p, type) {
+        let car, child;
+        let obstacles = [];
+        let state = 'DRIVING'; // DRIVING, CHILD_RUNS, DECISION, WAITING, RESUMING, FAILED, SUCCESS
+        let timer = 0;
+        let roadY, carY;
+
+        class Car {
+            constructor() {
+                this.x = -50;
+                this.speed = 2;
+                this.targetSpeed = 2;
+            }
+            update() {
+                this.speed = p.lerp(this.speed, this.targetSpeed, 0.1);
+                this.x += this.speed;
+            }
+            show() { p.fill(220); p.noStroke(); p.rect(this.x, carY, 40, 20); }
+        }
+
+        class Child {
+            constructor() {
+                this.x = p.width * 0.6;
+                this.y = roadY - 50;
+                this.speed = 1.5;
+                this.active = false;
+            }
+            update() {
+                if (this.active) { this.y += this.speed; }
+            }
+            show() {
+                if(this.active) { p.fill(100, 150, 255); p.noStroke(); p.circle(this.x, this.y, 10); }
+            }
+        }
+        
+        class Obstacle {
+            constructor(x) { this.x = x; this.y = roadY - 30; }
+            show() { p.fill(60); p.noStroke(); p.rect(this.x, this.y, 40, 20); }
+        }
+
+        p.setup = function() {
+            let container;
+            if (type === 'statistical') container = document.getElementById('statistical-ai-container');
+            else container = document.getElementById('causal-ai-container');
+            if (!container) return;
+            p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
+            p.rectMode(p.CENTER);
+            resetSketch();
+        };
+        
+        function resetSketch() {
+            roadY = p.height * 0.7;
+            carY = roadY + 20;
+
+            car = new Car();
+            child = new Child();
+            obstacles = [];
+            for(let i=0; i < 3; i++) {
+                obstacles.push(new Obstacle(p.width * 0.4 + i * 50));
+            }
+            state = 'DRIVING';
+            timer = 0;
+        }
+
+        p.draw = function() {
+            p.background(10, 10, 10);
+            drawScene();
+            
+            if(state !== 'FAILED' && state !== 'SUCCESS') {
+                car.update();
+                child.update();
+            }
+            
+            obstacles.forEach(o => o.show());
+            car.show();
+            child.show();
+
+            timer++;
+
+            if (state === 'DRIVING' && car.x > p.width / 4) {
+                state = 'CHILD_RUNS';
+                child.active = true;
+            }
+            
+            if (state === 'CHILD_RUNS' && child.y > roadY) {
+                 if (type === 'statistical') {
+                    car.targetSpeed = 2; // Keep going
+                    if (car.x > child.x) { 
+                        state = 'FAILED';
+                        timer = 0;
+                    }
+                } else { 
+                    state = 'DECISION';
+                }
+            }
+            
+            if (state === 'DECISION') {
+                car.targetSpeed = 0; 
+                if (p.abs(car.speed) < 0.1) {
+                    state = 'WAITING';
+                }
+            }
+
+            if (state === 'WAITING') {
+                if (child.y > carY + 20) {
+                    state = 'RESUMING';
+                }
+            }
+
+            if (state === 'RESUMING') {
+                car.targetSpeed = 2;
+                if (car.x > child.x + 30) {
+                     state = 'SUCCESS';
+                     timer = 0;
+                }
+            }
+            
+            if (state === 'FAILED') {
+                drawTextOverlay("SYSTEM FAILURE", 255, 0, 0, 32);
+                if(timer > 120) { resetSketch(); }
+            }
+            
+            if (state === 'SUCCESS') {
+                drawTextOverlay("SUCCESSFUL", 0, 255, 150, 32);
+                if(timer > 120) { resetSketch(); }
+            }
+
+            if (car.x > p.width + 50) { resetSketch(); }
+        };
+        
+        function drawScene() {
+            p.noStroke();
+            p.fill(35); p.rect(p.width/2, roadY, p.width, 80);
+            p.fill(70); p.rect(p.width/2, roadY - 50, p.width, 20);
+        }
+
+        function drawTextOverlay(msg, r, g, b, size) {
+            p.push();
+            let alpha = p.map(p.sin(p.frameCount * 0.05), -1, 1, 180, 255);
+            p.fill(r, g, b, alpha);
+            p.textAlign(p.CENTER, p.CENTER);
+            p.textSize(size);
+            p.textFont('Roboto Mono');
+            p.textStyle(p.BOLD);
+            p.text(msg, p.width / 2, p.height / 4);
+            p.pop();
+        }
+
+        p.windowResized = function() {
+            let container;
+            if (type === 'statistical') container = document.getElementById('statistical-ai-container');
+            else container = document.getElementById('causal-ai-container');
+            if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+            resetSketch();
+        };
+    }
+
+    new p5(p => twoAIsSketch(p, 'statistical'), 'statistical-ai-container');
+    new p5(p => twoAIsSketch(p, 'causal'), 'causal-ai-container');
+
+    // p5.js sketch for the Geometric Manifold
+    function manifoldSketch(p) {
+        let angle = 0;
+        let points = [];
+        let geodesicP1, geodesicP2;
+        const numPoints = 200;
+        const manifoldRadius = 150;
+
+        function getManifoldPos(u, v) {
+            let r = manifoldRadius + 20 * p.noise(u * 2, v * 2);
+            let x = r * p.sin(v) * p.cos(u);
+            let y = r * p.sin(v) * p.sin(u);
+            let z = r * p.cos(v);
+            return p.createVector(x, y, z);
+        }
+
+        p.setup = function() {
+            let container = document.getElementById('manifold-animation-container');
+            if (!container) return;
+            p.createCanvas(container.offsetWidth, container.offsetHeight, p.WEBGL).parent(container);
+
+            for (let i = 0; i < numPoints; i++) {
+                points.push(getManifoldPos(p.random(p.TWO_PI), p.random(p.PI)));
+            }
+            geodesicP1 = getManifoldPos(p.PI * 0.3, p.PI * 0.4);
+            geodesicP2 = getManifoldPos(p.PI * 1.5, p.PI * 0.6);
+        };
+
+        p.draw = function() {
+            p.background(10, 10, 10);
+            p.orbitControl(2, 2, 0.05);
+            p.rotateY(angle);
+            angle += 0.003;
+
+            // Draw translucent manifold surface (visual guide, not a solid)
+            p.noFill();
+            p.stroke(217, 255, 0, 20);
+            p.strokeWeight(0.5);
+            p.sphere(manifoldRadius);
+
+            // Draw data points
+            p.push();
+            p.noStroke();
+            points.forEach(pt => {
+                p.push();
+                p.translate(pt.x, pt.y, pt.z);
+                p.fill(217, 255, 0, 100);
+                p.sphere(2);
+                p.pop();
+            });
+            p.pop();
+
+            // Draw geodesic path
+            p.push();
+            p.stroke(217, 255, 0);
+            p.strokeWeight(3);
+            p.drawingContext.shadowBlur = 16;
+            p.drawingContext.shadowColor = 'rgba(217, 255, 0, 0.8)';
+            
+            let steps = 50;
+            p.beginShape();
+            for (let i = 0; i <= steps; i++) {
+                let t = i / steps;
+                let interp = p5.Vector.lerp(geodesicP1, geodesicP2, t);
+                
+                // Project interpolated point onto sphere surface for curved path
+                let r = manifoldRadius + 20 * p.noise(interp.x * 0.01, interp.y * 0.01);
+                interp.setMag(r);
+                p.vertex(interp.x, interp.y, interp.z);
+            }
+            p.endShape();
+            
+            p.drawingContext.shadowBlur = 0;
+            p.pop();
+
+            // Highlight geodesic points
+            [geodesicP1, geodesicP2].forEach(pt => {
+                p.push();
+                p.translate(pt.x, pt.y, pt.z);
+                p.fill(255);
+                p.noStroke();
+                p.sphere(4);
+                p.pop();
+            });
+        };
+
+        p.windowResized = function() {
+            let container = document.getElementById('manifold-animation-container');
+            if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+        };
+    }
+    new p5(manifoldSketch);
+
+    </script>
+</body>
+</html> 

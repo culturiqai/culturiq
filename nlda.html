@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLDA: The Glass Box | Culturiq Research</title>
+    <meta name="description" content="An in-depth look at NLDA (Natural Language Discovery Architecture), our open-source framework for building transparent, verifiable, and causal AI engines.">
+    <link rel="icon" href="images/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-accent: #d9ff00; /* Vibrant Lime/Chartreuse */
+            --brand-accent-light: #e5ff58;
+            --brand-text: #f0f0f0;
+            --brand-dark-bg: #0a0a0a;
+            --brand-dark-card: #111111;
+            
+            --glow-color-primary: rgba(217, 255, 0, 0.7);
+            --glow-color-secondary: rgba(217, 255, 0, 0.5);
+            --grid-color: rgba(217, 255, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--brand-dark-bg);
+            color: var(--brand-text);
+        }
+        h1, h2, h3, h4, .font-brand {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--brand-accent);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: var(--brand-accent);
+            color: var(--brand-dark-bg);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .section-title {
+           font-weight: 900;
+           letter-spacing: -0.025em;
+           font-family: 'Roboto Mono', monospace;
+        }
+        .text-glow {
+            text-shadow: 0 0 8px rgba(217, 255, 0, 0.3), 0 0 20px rgba(217, 255, 0, 0.2);
+        }
+        .bg-grid {
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .aspect-video {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        .aspect-video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="web.html" class="text-2xl font-black text-white font-brand flex items-center">
+                <img src="images/logo.png" alt="Culturiq Logo" class="h-8 inline-block mr-2">
+                <span>cultur<span class="text-[var(--brand-accent)]">iq</span></span>
+            </a>
+            <nav class="hidden md:flex space-x-8 text-gray-300">
+                <a href="web.html#vision" class="nav-link">Vision</a>
+                <a href="web.html#technology" class="nav-link">Technology</a>
+                <a href="web.html#milestones" class="nav-link">Milestones</a>
+                <a href="web.html#labs" class="nav-link">Labs</a>
+                <a href="web.html#team" class="nav-link">Team</a>
+            </nav>
+            <a href="web.html#join-us" class="hidden md:inline-block px-6 py-2 rounded-lg btn-primary font-brand">
+                Contact
+            </a>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <!-- Hero Section -->
+        <section class="py-20">
+        <div class="container mx-auto px-6">
+                <div class="lg:flex lg:items-center lg:gap-16">
+                    <!-- Left Column: Text -->
+                    <div class="lg:w-1/2">
+                        <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight text-glow">
+                    <span class="text-[var(--brand-accent)]">NLDA:</span> The Glass Box
+                </h1>
+                        <p class="mt-6 text-lg md:text-xl text-gray-400">The Nalanda Architecture (NLDA) is an open-source framework for building transparent and verifiable domain-specific AI. In a world of opaque, "black box" models, NLDA is designed as a "glass box"—a system whose reasoning process is modular, inspectable, and grounded in verifiable truth.</p>
+                    </div>
+                    <!-- Right Column: Animation -->
+                    <div class="mt-12 lg:mt-0 lg:w-1/2">
+                        <div id="nlda-animation-container" class="rounded-lg" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Black Box Section -->
+        <section class="py-20 bg-grid">
+            <div class="container mx-auto px-6">
+                 <div class="lg:flex lg:items-center lg:gap-16">
+                    <!-- Left Column: Text -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-3xl md:text-5xl section-title text-white">Beyond the Black Box</h2>
+                        <p class="mt-6 text-lg md:text-xl text-gray-400">Modern AI often operates as an unexplainable "black box." When you can't see an AI's reasoning process, you can't trust its outputs, especially in high-stakes fields like medicine or engineering. These systems are prone to "hallucination"—generating incorrect information with complete confidence—because their knowledge is not grounded in reality.</p>
+                        <p class="mt-4 text-lg md:text-xl text-gray-400">NLDA is the solution. It is a hybrid, self-correcting cognitive architecture where every claim is challenged and every conclusion is verifiable.</p>
+                    </div>
+                    <!-- Right Column: Animations -->
+                    <div class="mt-12 lg:mt-0 lg:w-1/2">
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Black Box -->
+                            <div>
+                                <div id="black-box-container" class="rounded-lg bg-black" style="height: 250px;"></div>
+                                <p class="mt-2 text-sm text-center text-red-400">The Black Box (Opaque AI)</p>
+                            </div>
+                             <!-- Glass Box -->
+                            <div>
+                                <div id="glass-box-container" class="rounded-lg bg-black" style="height: 250px;"></div>
+                                <p class="mt-2 text-sm text-center text-green-400">The Glass Box (NLDA)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Pillars Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <h2 class="text-3xl md:text-5xl section-title text-center text-[var(--brand-accent)]">The Three Pillars of NLDA</h2>
+                <div class="mt-16 space-y-20">
+                    <!-- Pillar 1: LLM -->
+                    <div class="lg:flex lg:items-center lg:gap-16">
+                        <div class="lg:w-1/2">
+                            <img src="images/llm_nlda.jpeg" alt="LLM as a reasoning engine connecting to simulators and knowledge bases" class="rounded-lg shadow-lg">
+                        </div>
+                        <div class="mt-8 lg:mt-0 lg:w-1/2">
+                            <h3 class="text-2xl font-bold text-white">LLM as a Reasoning Engine</h3>
+                            <p class="mt-4 text-lg text-gray-400">We use a Large Language Model not as an infallible knowledge base, but as a flexible controller to formulate hypotheses and deconstruct complex questions. The LLM acts as the system's "strategist," proposing actions and parsing information, while the core facts are managed and verified by other specialized modules.</p>
+                        </div>
+                    </div>
+                    <!-- Pillar 2: Simulators -->
+                    <div class="lg:flex lg:items-center lg:gap-16">
+                        <div class="lg:w-1/2 lg:order-2">
+                             <img src="images/sim_nlda.jpeg" alt="A sandbox environment with data streams entering a simulation sphere" class="rounded-lg shadow-lg">
+                        </div>
+                        <div class="mt-8 lg:mt-0 lg:w-1/2 lg:order-1">
+                            <h3 class="text-2xl font-bold text-white">Physics Simulators as Ground Truth</h3>
+                            <p class="mt-4 text-lg text-gray-400">NLDA grounds its reasoning in the laws of physics, not just statistical patterns in text. The architecture integrates with external simulators, creating a "Sandbox" where it can run experiments to test its hypotheses. This allows the AI to discover causal relationships and verify its beliefs against a source of ground truth.</p>
+                        </div>
+                    </div>
+                    <!-- Pillar 3: Verification -->
+                    <div class="lg:flex lg:items-center lg:gap-16">
+                        <div class="lg:w-1/2">
+                            <img src="images/veri_nlda.jpeg" alt="A self-correction loop showing belief, verification, error, and correction" class="rounded-lg shadow-lg">
+                        </div>
+                        <div class="mt-8 lg:mt-0 lg:w-1/2">
+                            <h3 class="text-2xl font-bold text-white">Verification and Self-Correction</h3>
+                            <p class="mt-4 text-lg text-gray-400">NLDA is inherently skeptical of its own conclusions. It employs a meta-cognitive loop where its claims are rigorously checked. When a simulation proves one of its beliefs wrong, the system doesn't just fail—it learns. It performs a targeted update to its knowledge store, permanently correcting its own mistake.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Open Source Section -->
+        <section class="py-20 bg-black/30">
+            <div class="container mx-auto px-6">
+                 <div class="lg:flex lg:items-center lg:gap-16">
+                    <!-- Left Column: Text -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-3xl md:text-5xl section-title text-white">Open Source for a Safer Future</h2>
+                        <p class="mt-6 text-lg md:text-xl text-gray-400">We believe that building safe and beneficial AGI is a challenge that requires global collaboration. The risks associated with closed, black-box systems are too great to be developed in isolation. By making the Nalanda Architecture an open-source project, we invite developers, researchers, and domain experts from around the world to inspect, contribute to, and build upon a foundation of transparency and verifiability.</p>
+                        <p class="mt-4 text-lg md:text-xl text-gray-400">Join us in building an AI that we can all understand and trust.</p>
+                        <div class="mt-10 flex flex-wrap gap-4">
+                             <a href="https://github.com/culturiqai/NLDA-SciChat" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 rounded-lg btn-primary">
+                                <svg class="w-6 h-6 mr-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                                Contribute on GitHub
+                             </a>
+                             <a href="web.html#join-us" class="inline-flex items-center px-6 py-3 rounded-lg bg-zinc-800 text-white font-bold hover:bg-zinc-700 transition">
+                                Register for Hackathon 2025 &rarr;
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Right Column: Animation -->
+                    <div class="mt-12 lg:mt-0 lg:w-1/2">
+                        <div id="open-source-container" class="rounded-lg" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Video Section -->
+        <section id="nlda-in-action" class="py-20">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <div class="text-center mb-12">
+                     <h2 class="text-3xl md:text-5xl section-title text-white">NLDA in Action</h2>
+                     <p class="mt-6 text-lg text-gray-400">Watch how NLDA-SciChat revolutionizes peptide-based drug discovery through conversational AI, accelerating the process by 80%.</p>
+                </div>
+                 <div class="mb-12 max-w-3xl mx-auto">
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-[var(--brand-accent)] mr-3 mt-1">&#10140;</span>
+                            <div><strong class="text-white">Conversational Interface:</strong> Answer complex peptide biology questions and call real-time molecular docking simulations directly from chat.</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-[var(--brand-accent)] mr-3 mt-1">&#10140;</span>
+                            <div><strong class="text-white">Automatic Equation Discovery:</strong> Discover mathematical equations from just 30 binding simulations and instantly validate them against scientific literature.</div>
+                        </li>
+                         <li class="flex items-start">
+                            <span class="text-[var(--brand-accent)] mr-3 mt-1">&#10140;</span>
+                            <div><strong class="text-white">Democratized Discovery:</strong> Pre-screen thousands of peptide candidates in milliseconds on a basic laptop, democratizing drug discovery for researchers without supercomputers.</div>
+                        </li>
+                </ul>
+                </div>
+                <div class="aspect-video rounded-xl overflow-hidden shadow-2xl shadow-black/50 border border-zinc-700">
+                    <iframe 
+                        src="https://www.youtube.com/embed/nsgl4ruZzsg" 
+                        title="YouTube video player"
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Back Button Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                 <a href="web.html#technology" class="inline-block px-8 py-3 rounded-lg bg-zinc-800 text-white font-bold hover:bg-zinc-700 transition">Back to Technologies</a>
+        </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800">
+        <!-- ... Footer content copied from web.html for consistency ... -->
+    </footer>
+    <script>
+    // p5.js sketch for NLDA Hero Animation "Glass Box"
+    function nldaHeroSketch(p) {
+        let angle = 0;
+        let points = [];
+        const numPoints = 60;
+        const cubeSize = 150;
+
+        p.setup = function() {
+            let container = document.getElementById('nlda-animation-container');
+            if (!container) return;
+            p.createCanvas(container.offsetWidth, container.offsetHeight, p.WEBGL).parent(container);
+            
+            // Create a point structure that subtly resembles the Git branch logo
+            const branchPoints = [
+                p.createVector(-cubeSize * 0.4, 0, 0),
+                p.createVector(-cubeSize * 0.15, 0, 0),
+                p.createVector(0, 0, 0), // Branch point
+                p.createVector(cubeSize * 0.3, cubeSize * 0.25, 0),
+                p.createVector(cubeSize * 0.5, cubeSize * 0.4, 0),
+                p.createVector(cubeSize * 0.3, -cubeSize * 0.25, 0),
+                p.createVector(cubeSize * 0.5, -cubeSize * 0.4, 0)
+            ];
+
+            points = [...branchPoints]; // Add the core points
+
+            // Add more points around the core structure for complexity
+            for (let i = 0; i < numPoints - branchPoints.length; i++) {
+                let parent = p.random(branchPoints);
+                points.push(p.createVector(
+                    parent.x + p.random(-20, 20),
+                    parent.y + p.random(-20, 20),
+                    parent.z + p.random(-20, 20)
+                ));
+            }
+        };
+
+        p.draw = function() {
+            p.background(10, 10, 10);
+            p.orbitControl(2.5, 2.5, 0.05);
+            p.rotateY(angle);
+            angle += 0.005;
+
+            p.drawingContext.shadowBlur = 12;
+            p.drawingContext.shadowColor = 'rgba(217, 255, 0, 0.5)';
+            
+            p.stroke(217, 255, 0);
+            p.strokeWeight(1.5);
+            for (let i = 0; i < points.length; i++) {
+                for (let j = i + 1; j < points.length; j++) {
+                    if (points[i].dist(points[j]) < cubeSize / 3) { // Adjusted distance for clearer branches
+                        p.line(points[i].x, points[i].y, points[i].z, points[j].x, points[j].y, points[j].z);
+                    }
+                }
+            }
+            
+            p.drawingContext.shadowBlur = 0;
+            p.noFill();
+            p.stroke(255, 255, 255, 60);
+            p.strokeWeight(2);
+            p.box(cubeSize * 1.6);
+        };
+        
+        p.windowResized = function() {
+            let container = document.getElementById('nlda-animation-container');
+            if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+        };
+    }
+    new p5(nldaHeroSketch);
+
+    // p5.js sketch for Black Box vs Glass Box visualization
+    function boxSketch(p, type) {
+        let angle = 0;
+        let questionMark, outputSymbol;
+        let pathTracer = 0;
+        let internalNodes = [];
+
+        p.setup = function() {
+            let container;
+            if (type === 'black') container = document.getElementById('black-box-container');
+            else container = document.getElementById('glass-box-container');
+            if (!container) return;
+            p.createCanvas(container.offsetWidth, container.offsetHeight, p.WEBGL).parent(container);
+            questionMark = { x: -p.width, y: 0, z: 0 };
+            outputSymbol = { char: type === 'black' ? '§' : '✓', x: p.width, y: 0, z: 0, show: false };
+            
+            // Create internal structure for glass box
+            if(type === 'glass') {
+                 internalNodes = [ p.createVector(-30, 0, 0), p.createVector(0, 20, 0), p.createVector(30, 0, 0) ];
+            }
+        };
+
+        p.draw = function() {
+            p.background(10, 10, 10);
+            p.rotateY(angle);
+            angle += 0.01;
+
+            // Animate question mark
+            if (questionMark.x < -60) {
+                questionMark.x += 2;
+            } else {
+                outputSymbol.show = true;
+            }
+            
+            p.push();
+            p.translate(questionMark.x, questionMark.y, questionMark.z);
+            p.fill(255); p.textSize(24); p.textAlign(p.CENTER); p.text('?', 0, 0);
+            p.pop();
+            
+            // Animate output
+            if(outputSymbol.show && outputSymbol.x > 60) {
+                outputSymbol.x -= 2;
+            }
+             p.push();
+            p.translate(outputSymbol.x, outputSymbol.y, outputSymbol.z);
+            if(type === 'black') p.fill(255, 100, 100); else p.fill(100, 255, 100);
+            p.textSize(32); p.textAlign(p.CENTER); p.text(outputSymbol.char, 0, 0);
+            p.pop();
+
+            // Draw Box
+            if (type === 'black') {
+                p.fill(15, 15, 15, 240); p.stroke(50);
+                p.box(100);
+            } else {
+                p.noFill(); p.stroke(255, 255, 255, 80);
+                p.box(100);
+                // Draw internal path
+                p.stroke(217, 255, 0); p.strokeWeight(2);
+                p.line(internalNodes[0].x, internalNodes[0].y, internalNodes[0].z, internalNodes[1].x, internalNodes[1].y, internalNodes[1].z);
+                p.line(internalNodes[1].x, internalNodes[1].y, internalNodes[1].z, internalNodes[2].x, internalNodes[2].y, internalNodes[2].z);
+
+                // Animate path tracer
+                if(pathTracer < 1) pathTracer += 0.02;
+                let currentPos;
+                if(pathTracer < 0.5) currentPos = p5.Vector.lerp(internalNodes[0], internalNodes[1], pathTracer * 2);
+                else currentPos = p5.Vector.lerp(internalNodes[1], internalNodes[2], (pathTracer - 0.5) * 2);
+                
+                p.push();
+                p.translate(currentPos.x, currentPos.y, currentPos.z);
+                p.fill(255); p.sphere(4);
+                p.pop();
+            }
+            
+            if(outputSymbol.x <= 60 && p.frameCount % 240 === 0) { // Reset after a while
+                questionMark = { x: -p.width, y: 0, z: 0 };
+                outputSymbol.x = p.width;
+                outputSymbol.show = false;
+                pathTracer = 0;
+            }
+        };
+
+        p.windowResized = function() {
+            let container;
+            if (type === 'black') container = document.getElementById('black-box-container');
+            else container = document.getElementById('glass-box-container');
+            if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+        };
+    }
+
+    new p5(p => boxSketch(p, 'black'), 'black-box-container');
+    new p5(p => boxSketch(p, 'glass'), 'glass-box-container');
+
+    // p5.js sketch for the Open Source community animation
+    function openSourceSketch(p) {
+        let coreNode;
+        let contributors = [];
+        const numContributors = 50;
+
+        class CoreNode {
+            constructor() { this.pos = p.createVector(p.width / 2, p.height / 2); }
+            show() {
+                p.push();
+                p.translate(this.pos.x, this.pos.y);
+                let pulse = p.map(p.sin(p.frameCount * 0.02), -1, 1, 0, 20);
+                p.drawingContext.shadowBlur = 32;
+                p.drawingContext.shadowColor = 'rgba(217, 255, 0, 0.5)';
+                p.fill(217, 255, 0);
+                p.noStroke();
+                p.circle(0, 0, 40 + pulse);
+                p.drawingContext.shadowBlur = 0;
+                
+                p.fill(10); p.textAlign(p.CENTER, p.CENTER); p.textSize(18); p.textFont('Roboto Mono');
+                p.text('NLDA', 0, 0);
+                p.pop();
+            }
+        }
+
+        class Contributor {
+            constructor() {
+                this.pos = p.createVector(p.random(p.width), p.random(p.height));
+                this.vel = p5.Vector.random2D().mult(0.5);
+                this.target = p.createVector(coreNode.pos.x + p.random(-150, 150), coreNode.pos.y + p.random(-150, 150));
+                this.connected = false;
+            }
+            update() {
+                if (!this.connected) {
+                    let steer = p5.Vector.sub(this.target, this.pos);
+                    steer.limit(0.1);
+                    this.vel.add(steer);
+                    this.vel.limit(1.5);
+                    this.pos.add(this.vel);
+
+                    if (this.pos.dist(this.target) < 2) {
+                        this.connected = true;
+                    }
+                }
+            }
+            show() {
+                p.fill(255, 180); p.noStroke();
+                p.circle(this.pos.x, this.pos.y, 6);
+                if(this.connected) {
+                    p.stroke(217, 255, 0, 100);
+                    p.strokeWeight(1);
+                    p.line(this.pos.x, this.pos.y, coreNode.pos.x, coreNode.pos.y);
+                }
+            }
+        }
+
+        p.setup = function() {
+            let container = document.getElementById('open-source-container');
+            if (!container) return;
+            p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
+            coreNode = new CoreNode();
+            for(let i=0; i < numContributors; i++) {
+                contributors.push(new Contributor());
+            }
+        };
+
+        p.draw = function() {
+            p.background(10, 10, 10);
+            coreNode.show();
+            contributors.forEach(c => {
+                c.update();
+                c.show();
+            });
+        };
+        
+        p.windowResized = function() {
+            let container = document.getElementById('open-source-container');
+            if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+            coreNode.pos.set(p.width / 2, p.height / 2);
+            contributors = [];
+            for(let i=0; i < numContributors; i++) {
+                contributors.push(new Contributor());
+            }
+        };
+    }
+    new p5(openSourceSketch);
+    </script>
+</body>
+</html> 

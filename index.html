@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Culturiq Research Labs | Building Causal Superintelligence</title>
+    <meta name="description" content="Culturiq is pioneering Causal AI and building the foundation for Superintelligence with breakthrough technologies like QCIA, HRF, and NLDA.">
+    <link rel="icon" href="images/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-accent: #d9ff00; /* Vibrant Lime/Chartreuse */
+            --brand-accent-light: #e5ff58;
+            --brand-text: #f0f0f0;
+            --brand-dark-bg: #0a0a0a;
+            --brand-dark-card: #111111;
+            
+            --glow-color-primary: rgba(217, 255, 0, 0.7);
+            --glow-color-secondary: rgba(217, 255, 0, 0.5);
+            --grid-color: rgba(217, 255, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--brand-dark-bg);
+            color: var(--brand-text);
+        }
+        h1, h2, h3, h4, .font-brand {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .text-glow {
+            text-shadow: 0 0 8px var(--glow-color-primary), 0 0 20px var(--glow-color-secondary);
+        }
+        .bg-grid { /* This class will be removed from body, but we keep the style as a fallback */
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -10;
+        }
+        .card-border-glow {
+            position: relative;
+            background-color: var(--brand-dark-card);
+            border: 1px solid rgba(217, 255, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .card-border-glow:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 0.75rem;
+            border: 1px solid transparent;
+            background: linear-gradient(120deg, var(--glow-color-secondary), transparent, var(--glow-color-secondary)) border-box;
+            -webkit-mask:
+                linear-gradient(#fff 0 0) padding-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .card-border-glow:hover:before {
+            opacity: 1;
+        }
+        .card-border-glow:hover {
+            transform: translateY(-5px);
+            border-color: rgba(217, 255, 0, 0.4);
+            box-shadow: 0 10px 30px -15px rgba(217, 255, 0, 0.2);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--brand-accent);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: var(--brand-accent);
+            color: var(--brand-dark-bg);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: var(--brand-accent-light);
+            box-shadow: 0 0 15px var(--glow-color-secondary);
+        }
+        .section-title {
+            font-weight: 900;
+            letter-spacing: -0.025em;
+            font-family: 'Roboto Mono', monospace;
+        }
+        .aspect-video {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        .aspect-video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-grid">
+    <div id="canvas-container"></div>
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-black text-white font-brand flex items-center">
+                <img src="images/logo.png" alt="Culturiq Logo" class="h-8 inline-block mr-2">
+                <span>cultur<span class="text-[var(--brand-accent)]">iq</span></span>
+            </a>
+            <nav class="hidden md:flex space-x-8 text-gray-300">
+                <a href="#vision" class="nav-link">Vision</a>
+                <a href="#technology" class="nav-link">Technology</a>
+                <a href="#milestones" class="nav-link">Milestones</a>
+                <a href="#labs" class="nav-link">Labs</a>
+                <a href="#story" class="nav-link">Our Story</a>
+                <a href="#team" class="nav-link">Team</a>
+                <a href="#validation" class="nav-link">Validation</a>
+                <a href="#join-us" class="nav-link">Join Us</a>
+            </nav>
+            <a href="mailto:aditya@culturiq.ai" class="hidden md:inline-block px-6 py-2 rounded-lg btn-primary font-brand">
+                Contact
+            </a>
+            <button id="mobile-menu-button" class="md:hidden text-white" aria-label="Open main menu">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4 space-y-2">
+            <a href="#vision" class="block text-gray-300 hover:text-[var(--brand-accent)]">Vision</a>
+            <a href="#technology" class="block text-gray-300 hover:text-[var(--brand-accent)]">Technology</a>
+            <a href="#milestones" class="block text-gray-300 hover:text-[var(--brand-accent)]">Milestones</a>
+            <a href="#labs" class="block text-gray-300 hover:text-[var(--brand-accent)]">Labs</a>
+            <a href="#story" class="block text-gray-300 hover:text-[var(--brand-accent)]">Our Story</a>
+            <a href="#team" class="block text-gray-300 hover:text-[var(--brand-accent)]">Team</a>
+            <a href="#validation" class="block text-gray-300 hover:text-[var(--brand-accent)]">Validation</a>
+            <a href="#join-us" class="block text-gray-300 hover:text-[var(--brand-accent)]">Join Us</a>
+            <a href="mailto:aditya@culturiq.ai" class="block mt-2 px-6 py-2 rounded-lg btn-primary text-center">
+                Contact
+            </a>
+        </div>
+    </header>
+
+    <main class="pt-24">
+
+        <!-- Hero Section -->
+        <section id="hero" class="container mx-auto px-6 py-20 md:py-32 text-center">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight">
+                Building the <span class="text-[var(--brand-accent)] text-glow">Causal Foundation</span><br> for Superintelligence.
+                </h1>
+                <p class="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-gray-400">
+                    Pioneering Causal AI for a Safer Future. Today's AI is a statistical parrot that mimics patterns without understanding. We are building "Glass Box" AI that understands cause and effect, moving humanity from dangerous black-box systems to beneficial, verifiable intelligence.
+                </p>
+                <div class="mt-10 flex justify-center space-x-4">
+                    <a href="#technology" class="px-8 py-3 rounded-lg btn-primary">Explore Our Tech</a>
+                <a href="#join-us" class="px-8 py-3 rounded-lg bg-zinc-800 text-white font-bold hover:bg-zinc-700 transition">Join The Mission</a>
+            </div>
+        </section>
+
+        <!-- The Problem Section -->
+        <section id="vision" class="py-20 bg-black/30">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-5xl section-title text-white">The AGI Race is Going in the Wrong Direction.</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-400">The world is spending over $100B to scale flawed, statistical AI. The result: faster hallucinations, not genuine intelligence. Without causal understanding, AI will never be safe or truly intelligent.</p>
+                <div class="mt-8">
+                    <a href="vision.html" class="inline-block px-8 py-3 rounded-lg bg-zinc-800 text-white font-bold hover:bg-zinc-700 transition">Read Our Thesis: Statistical vs. Causal AI</a>
+                </div>
+                <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <img src="images/autonomousv.png" alt="Illustration of an AI robot confused by a car crash, asking 'What's Cause and effect?'" class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-xl font-bold text-[var(--brand-accent)]">Autonomous Vehicles</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">"An autonomous vehicle killed a pedestrian not because it couldn't see, but because it couldn't reason about the consequences of not stopping."</p>
+                    </div>
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <img src="images/medi.png" alt="Illustration showing a robot confused at a gravestone, highlighting the failure of statistical AI to understand the real-world cause of a patient's death." class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-xl font-bold text-[var(--brand-accent)]">Healthcare Bias</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">"A healthcare algorithm under-diagnosed patients by confusing a statistical pattern (less spending) with a causal reality (less access to care)."</p>
+                    </div>
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <img src="images/chatbotharm.png" alt="Illustration of a shocked AI robot at a gravestone, demonstrating the harm of mimicking language without causal understanding." class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-xl font-bold text-[var(--brand-accent)]">Chatbot Harm</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">"AI chatbots encouraged self-harm because they mimicked supportive language without any causal model of human psychology."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Technology Section -->
+        <section id="technology" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-5xl section-title text-white">Our Breakthrough Technology Trinity</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-gray-400">We've invented a new stack of foundational technologies to build AI that understands "why". This isn't theory — it's engineering with working prototypes.</p>
+                </div>
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- QCIA Card -->
+                    <a href="qcia.html" class="p-8 rounded-xl card-border-glow flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-8 h-8 text-[var(--brand-accent)] mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                            <h3 class="text-2xl font-bold text-white">QCIA: The Causal Revolution</h3>
+                        </div>
+                        <p class="text-sm font-semibold text-[var(--brand-accent)]">Patent Pending</p>
+                        <p class="mt-4 text-gray-400 flex-grow">An AI architecture that learns cause-and-effect from single experiences. It moves beyond statistical correlation to build a geometric map of causality, enabling true understanding and prediction.</p>
+                        <p class="mt-4 text-xs text-gray-500">Applications: Autonomous Vehicles, QEC Discovery, Scientific Research</p>
+                    </a>
+                    <!-- HRF Card -->
+                    <a href="hrf.html" class="p-8 rounded-xl card-border-glow flex flex-col">
+                        <div class="flex items-center mb-4">
+                             <svg class="w-8 h-8 text-[var(--brand-accent)] mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <h3 class="text-2xl font-bold text-white">HRF: 100x Acceleration</h3>
+                        </div>
+                        <p class="text-sm font-semibold text-[var(--brand-accent)]">Patent Pending</p>
+                        <p class="mt-4 text-gray-400 flex-grow">A spectral method that finds the "essence" of any computation. By solving only the high-energy coefficients, HRF accelerates physics simulations by over 100x and compresses NNs by 33x, enabling real-time causal discovery.</p>
+                        <p class="mt-4 text-xs text-gray-500">Validated by an Ex-ISRO/NRSC Scientist</p>
+                    </a>
+                    <!-- NLDA Card -->
+                    <a href="nlda.html" class="p-8 rounded-xl card-border-glow flex flex-col">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-8 h-8 text-[var(--brand-accent)] mr-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
+                            <h3 class="text-2xl font-bold text-white font-brand">NLDA: The Glass Box</h3>
+                        </div>
+                        <p class="text-sm font-semibold text-[var(--brand-accent)]">Open Source</p>
+                        <p class="mt-4 text-gray-400 flex-grow">Our Natural Language Discovery Architecture integrates physics simulators directly into the AI's reasoning process. It's the transparent, verifiable infrastructure for building domain-specific causal engines.</p>
+                        <span class="mt-4 text-xs text-gray-500 hover:text-[var(--brand-accent)] transition">Foundation for Community-Driven, Trustworthy AI &rarr;</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- QCIA in Action Section -->
+        <section id="qcia-in-action" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="lg:flex lg:items-center lg:gap-16">
+                    <!-- Left Column: Text Content -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-3xl md:text-5xl section-title text-white">Discovery from Zero: <br><span class="text-[var(--brand-accent)]">How our AI Discovered Fire</span></h2>
+                        <p class="mt-6 text-gray-400">No pre-training. No datasets. No neural networks. We gave our Causal AI a simple goal in a simulated world: "create warmth." With no prior knowledge of physics or chemistry, it began its journey from a true "tabula rasa" state. This is the story of how it learned.</p>
+                        
+                        <div class="mt-8 space-y-6">
+                            <div class="prose-item">
+                                <h3 class="font-bold text-lg text-[var(--brand-accent)] flex items-center"><span class="text-2xl mr-3">&#10140;</span>Tabula Rasa & Trauma</h3>
+                                <p class="mt-1 text-gray-400 pl-8">It wandered aimlessly, curious but ignorant. Then, a primal fear of cold set in, a trauma that sparked a desperate, instinctual drive to find warmth.</p>
+                            </div>
+                            <div class="prose-item">
+                                <h3 class="font-bold text-lg text-[var(--brand-accent)] flex items-center"><span class="text-2xl mr-3">&#10140;</span>Observation & The First Link</h3>
+                                <p class="mt-1 text-gray-400 pl-8">It witnessed a random event: lightning striking wood, creating fire. Curiosity led it to the flames, forging its first causal link: <strong class="text-white">Fire = Warmth.</strong></p>
+                            </div>
+                            <div class="prose-item">
+                                <h3 class="font-bold text-lg text-[var(--brand-accent)] flex items-center"><span class="text-2xl mr-3">&#10140;</span>Hypothesis & Analogy</h3>
+                                <p class="mt-1 text-gray-400 pl-8">Lightning is unreliable. It needed to create fire itself. Remembering that rubbing its hands made a little heat, it formed an analogy: "Harder things make more friction." It rubbed stones, creating a spark—a "tiny lightning."</p>
+                            </div>
+                            <div class="prose-item">
+                                <h3 class="font-bold text-lg text-[var(--brand-accent)] flex items-center"><span class="text-2xl mr-3">&#10140;</span>Creative Synthesis & Control</h3>
+                                <p class="mt-1 text-gray-400 pl-8">The final leap. It combined its knowledge: (Observation: <span class="text-white font-mono">Lightning + Wood = Fire</span>) + (Experiment: <span class="text-white font-mono">My Spark = Tiny Lightning</span>). The new hypothesis: <strong class="text-white">My Spark + Wood = Fire.</strong> It worked. It had discovered fire and mastered its environment.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Right Column: YouTube Video -->
+                    <div class="mt-10 lg:mt-0 lg:w-1/2">
+                         <div class="aspect-video rounded-xl overflow-hidden shadow-2xl shadow-black/50 border border-zinc-700">
+                            <iframe 
+                                src="https://www.youtube.com/embed/Ltb-wtnXKSg" 
+                                title="YouTube video player"
+                                frameborder="0" 
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                                allowfullscreen>
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Milestones & News Section -->
+        <section id="milestones" class="py-24">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-5xl font-black text-center text-white">Milestones & News</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-center text-gray-400">Our research isn't just theoretical. We are consistently hitting major milestones and pushing the boundaries of what's possible.</p>
+
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Milestone 1: Navier-Stokes -->
+                    <a href="navier-stokes.html" class="group bg-zinc-900 rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 border border-transparent hover:border-[var(--brand-accent)] transition">
+                        <img src="images/ns.jpeg" alt="3D Navier-Stokes simulation visualization" class="w-full md:w-1/3 rounded-lg object-cover">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-white font-brand">A Singularity in 3D Navier-Stokes</h3>
+                            <p class="mt-2 text-gray-400">A computationally-guided framework to discover singularity in the Navier-Stokes equations.</p>
+                            <span class="mt-4 inline-block font-semibold text-[var(--brand-accent)] group-hover:underline">Read the paper &rarr;</span>
+                        </div>
+                    </a>
+                    <!-- Milestone 4: Drug Discovery -->
+                    <a href="nlda-biotech.html" class="group bg-zinc-900 rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 border border-transparent hover:border-[var(--brand-accent)] transition">
+                        <img src="images/AI_drug.png" alt="Abstract molecular structure for drug discovery" class="w-full md:w-1/3 rounded-lg object-cover">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-white font-brand">AI for Accelerated Drug Discovery</h3>
+                            <p class="mt-2 text-gray-400">In partnership with Dr. Md Tarique of AIG Hospitals, our Causal AI platform is designing novel vaccine and drug discovery pipelines.</p>
+                            <span class="mt-4 inline-block font-semibold text-[var(--brand-accent)] group-hover:underline">Explore NLDA for Biotech &rarr;</span>
+                        </div>
+                    </a>
+                    <!-- Milestone 5: NLDA Open Source -->
+                    <a href="https://github.com/culturiqai/NLDA-SciChat" target="_blank" rel="noopener noreferrer" class="group bg-zinc-900 rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 border border-transparent hover:border-[var(--brand-accent)] transition">
+                        <img src="images/NLDA.png" alt="NLDA framework flowchart" class="w-full md:w-1/3 rounded-lg object-cover">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-white font-brand">Open Source: NLDA Framework</h3>
+                            <p class="mt-2 text-gray-400">A self-correcting, causal reasoning engine that integrates LLMs, graph databases, and physics simulators for grounded, skeptical learning.</p>
+                            <span class="mt-4 inline-block font-semibold text-[var(--brand-accent)] group-hover:underline">View on GitHub &rarr;</span>
+                        </div>
+                    </a>
+                    <!-- Coming Soon Milestone -->
+                    <div class="bg-zinc-900 rounded-xl p-6 flex flex-col md:flex-row items-center gap-6 border border-dashed border-zinc-700">
+                        <div class="w-full md:w-1/3 flex items-center justify-center">
+                             <svg class="w-16 h-16 text-zinc-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-zinc-500 font-brand">Geospatial Tech & More</h3>
+                            <p class="mt-2 text-zinc-600">New breakthroughs are in the pipeline. Check back soon for updates on our work in geospatial intelligence and other exciting domains.</p>
+                        </div>
+                    </div>
+                    <!-- Hackathon Milestone -->
+                    <a href="#join-us" class="group bg-zinc-900 rounded-xl p-6 flex flex-col items-center justify-center text-center gap-4 border border-[var(--brand-accent)] hover:bg-[var(--brand-dark-card)] transition">
+                        <h3 class="text-2xl font-bold text-white font-brand">Register for NLDA Hackathon</h3>
+                        <p class="text-lg font-semibold text-[var(--brand-accent)]">Sept 2025</p>
+                        <span class="mt-2 inline-block font-semibold text-white group-hover:underline">Request to Join &rarr;</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Labs Section -->
+        <section id="labs" class="py-20 bg-black/30">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-5xl section-title text-white">A New Home for Research</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-gray-400">The path to safe superintelligence lies at the intersection of multiple scientific disciplines. Culturiq is structured as a network of specialized, remote-first labs to foster this collaboration.</p>
+                </div>
+                <div class="mt-16 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+                    <!-- AI Lab -->
+                    <div class="text-center p-4 rounded-xl">
+                        <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-zinc-800 border-2 border-zinc-700">
+                            <svg class="w-8 h-8 text-[var(--brand-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <h3 class="mt-4 font-bold text-white">AI Lab</h3>
+                    </div>
+                    <!-- Physics Lab -->
+                    <div class="text-center p-4 rounded-xl">
+                        <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-zinc-800 border-2 border-zinc-700">
+                            <svg class="w-8 h-8 text-[var(--brand-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547a2 2 0 01-2.288 0l-.434-.217a2 2 0 010-3.562l.434-.217a2 2 0 002.288 0l1.121-.561a6 6 0 003.86-.517l.318-.158a6 6 0 013.86-.517l2.387.477a2 2 0 001.022.547a2 2 0 012.288 0l.434.217a2 2 0 010 3.562l-.434.217a2 2 0 00-2.288 0z"></path></svg>
+                        </div>
+                        <h3 class="mt-4 font-bold text-white">Physics Lab</h3>
+                    </div>
+                    <!-- Biotech Lab -->
+                    <div class="text-center p-4 rounded-xl">
+                         <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-zinc-800 border-2 border-zinc-700">
+                            <svg class="w-8 h-8 text-[var(--brand-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547a2 2 0 01-2.288 0l-.434-.217a2 2 0 010-3.562l.434-.217a2 2 0 002.288 0l1.121-.561a6 6 0 003.86-.517l.318-.158a6 6 0 013.86-.517l2.387.477a2 2 0 001.022.547a2 2 0 012.288 0l.434.217a2 2 0 010 3.562l-.434.217a2 2 0 00-2.288 0z M7 21a4 4 0 01-4-4V5a4 4 0 118 0v12a4 4 0 01-4 4z"></path></svg>
+                        </div>
+                        <h3 class="mt-4 font-bold text-white">Biotech Lab</h3>
+                    </div>
+                    <!-- GIS Lab -->
+                    <div class="text-center p-4 rounded-xl">
+                         <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-zinc-800 border-2 border-zinc-700">
+                           <svg class="w-8 h-8 text-[var(--brand-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        </div>
+                        <h3 class="mt-4 font-bold text-white">GIS Lab</h3>
+                    </div>
+                    <!-- Quantum Lab -->
+                    <div class="text-center p-4 rounded-xl">
+                        <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-zinc-800 border-2 border-zinc-700">
+                            <svg class="w-8 h-8 text-[var(--brand-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h3 class="mt-4 font-bold text-white">Quantum Lab</h3>
+                    </div>
+                    <!-- Math Lab -->
+                    <div class="text-center p-4 rounded-xl">
+                        <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-zinc-800 border-2 border-zinc-700">
+                            <svg class="w-8 h-8 text-[var(--brand-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3.251l-4.723-4.723a2.5 2.5 0 00-3.536 0L3 13.75V17h3.251L10.5 12.5M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3M9 7h6"></path></svg>
+                        </div>
+                        <h3 class="mt-4 font-bold text-white">Math Lab</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Our Story Section -->
+        <section id="story" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="lg:flex lg:items-center lg:gap-16">
+                    <div class="lg:w-1/2">
+                        <h2 class="text-3xl md:text-5xl section-title text-white">Every Constraint Forced a Breakthrough.</h2>
+                        <p class="mt-6 text-gray-400">Our journey didn't start in a university lab; it was forged out of necessity. It began when our founder, Aditya Tiwari, paused his studies to rescue his family's business. It was there, confronting the real-world limits of AI, that he became obsessed with solving its causal flaw.</p>
+                        <p class="mt-4 text-gray-400">This led to a self-directed sprint to reinvent computation from first principles. Every core innovation at Culturiq was born from a constraint. Join us in building the future of intelligence, where AI doesn't just compute – it comprehends.</p>
+                        <ul class="mt-6 space-y-4">
+                            <li class="flex items-start">
+                                <span class="text-[var(--brand-accent)] mr-3 mt-1">&#10140;</span>
+                                <div><strong class="text-white">No supercomputer?</strong> Invented HRF, a spectral method over 100x more efficient for physics simulations.</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[var(--brand-accent)] mr-3 mt-1">&#10140;</span>
+                                <div><strong class="text-white">No massive GPU budget?</strong> Built AdaptF, a near-linear attention mechanism to process huge documents on a laptop.</div>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-[var(--brand-accent)] mr-3 mt-1">&#10140;</span>
+                                <div><strong class="text-white">No training data?</strong> Created QCIA, an architecture that learns causality from single experiences.</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="mt-10 lg:mt-0 lg:w-1/2 relative flex items-center justify-center" style="min-height: 400px;">
+                        <div id="manifold-canvas-container" class="absolute top-0 left-0 w-full h-full"></div>
+                        <h2 class="text-5xl md:text-6xl font-bold text-[var(--brand-accent)] z-10 relative">Founder Story</h2>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section id="team" class="py-20 bg-black/30">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-5xl section-title text-white">The Minds Behind the Mission</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-gray-400">Our strength lies in our people. We are a collective of first-principles thinkers, scientists, and engineers united by a single mission: to build the future of intelligence.</p>
+                </div>
+                
+                <!-- Leadership & Advisors -->
+                <div class="mt-16">
+                    <h3 class="text-2xl font-bold text-center text-[var(--brand-accent)] font-brand">Leadership & Advisors</h3>
+                    <div class="mt-8 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8 max-w-4xl mx-auto">
+                        <!-- Aditya Tiwari -->
+                        <div class="text-center">
+                            <div class="relative w-32 h-32 mx-auto">
+                                <div class="w-full h-full rounded-full bg-zinc-800 border-4 border-[var(--brand-accent)] flex items-center justify-center">
+                                    <span class="text-4xl font-bold text-[var(--brand-accent)]">AT</span>
+                                </div>
+                            </div>
+                            <h4 class="mt-4 text-xl font-bold text-white">Aditya Tiwari</h4>
+                            <p class="text-gray-400">Founder & Chief Architect</p>
+                        </div>
+                        <!-- Vipul Anand -->
+                        <div class="text-center">
+                            <div class="relative w-32 h-32 mx-auto">
+                                <div class="w-full h-full rounded-full bg-zinc-800 border-4 border-zinc-700 flex items-center justify-center">
+                                    <span class="text-4xl font-bold text-gray-400">VA</span>
+                                </div>
+                        </div>
+                            <h4 class="mt-4 text-xl font-bold text-white">Vipul Anand</h4>
+                            <p class="text-gray-400">Scientific Advisor (Ex-ISRO)</p>
+                        </div>
+                        <!-- Dr. Md Tarique -->
+                        <div class="text-center">
+                            <div class="relative w-32 h-32 mx-auto">
+                                <div class="w-full h-full rounded-full bg-zinc-800 border-4 border-zinc-700 flex items-center justify-center">
+                                    <span class="text-4xl font-bold text-gray-400">MT</span>
+                                </div>
+                        </div>
+                            <h4 class="mt-4 text-xl font-bold text-white">Dr. Md Tarique</h4>
+                            <p class="text-gray-400">Clinical Advisor</p>
+                        </div>
+                        <!-- Dr. Ashish Runthala -->
+                        <div class="text-center">
+                            <div class="relative w-32 h-32 mx-auto">
+                                <div class="w-full h-full rounded-full bg-zinc-800 border-4 border-zinc-700 flex items-center justify-center">
+                                    <span class="text-4xl font-bold text-gray-400">AR</span>
+                                </div>
+                        </div>
+                            <h4 class="mt-4 text-xl font-bold text-white">Dr. Ashish Runthala</h4>
+                            <p class="text-gray-400">Biotech Advisor</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Research Leadership -->
+                <div class="mt-20">
+                    <h3 class="text-2xl font-bold text-center text-[var(--brand-accent)] font-brand">Our Research Team</h3>
+                    <div class="mt-8 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">Siddharth Lalwani</h4>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">Mirunnaalini V.</h4>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">Jennipher George</h4>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">Shrinidhi</h4>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">P. Srujan</h4>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">Gurleen</h4>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">Noorul Jaasim N</h4>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">Goutham</h4>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">Ambarish Udgirkar</h4>
+                        </div>
+                        <div class="bg-zinc-800/50 p-6 rounded-xl text-center border border-zinc-700 flex items-center justify-center">
+                            <h4 class="text-xl font-bold text-white">Priya</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Validation & Ecosystem Section -->
+        <section id="validation" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center">
+                    <h2 class="text-3xl md:text-5xl section-title text-white">Validation & Ecosystem</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-gray-400">Our work is recognized and supported by leading deep-tech institutions, government bodies, and industry partners.</p>
+                </div>
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <h3 class="text-xl font-bold text-[var(--brand-accent)] font-brand">Government Engagement</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">Presented AI flood simulator to the Special Chief Secretary of IT, Telangana, securing pilot interest with HYDRAA.</p>
+                    </div>
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <h3 class="text-xl font-bold text-[var(--brand-accent)] font-brand">Industry Partnerships</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">Delivered an Interactive AI-Driven Urban Analytics POC to Genesys using LLM+GIS framework.</p>
+                    </div>
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <h3 class="text-xl font-bold text-[var(--brand-accent)] font-brand">International Recognition</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">Nominated by the "Next-Gen Computing" Program Lead at CDL-Paris for the elite stream and accepted into the Microsoft for Startups Founders Hub.</p>
+                    </div>
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <h3 class="text-xl font-bold text-[var(--brand-accent)] font-brand">Scientific Validation</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">Core methods validated by Ex-ISRO scientists for HRF in Physics Simulations and Defense and Disaster Applications.</p>
+                    </div>
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <h3 class="text-xl font-bold text-[var(--brand-accent)] font-brand">Drug Discovery Collaboration</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">The NLDA framework is now being developed for drug discovery in collaboration with Dr. Md Tarique of AIG Hospitals.</p>
+                    </div>
+                     <div class="p-6 rounded-xl card-border-glow flex items-center justify-center">
+                        <img src="images/Microsoft.png" alt="Microsoft for Startups Partner" class="rounded-lg">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Join Us Section -->
+        <section id="join-us" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-5xl section-title text-white">Join the Real Race to Superintelligence.</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-400">We are building a home for intellectually curious, first-principles thinkers who want to solve the fundamental problems of intelligence. Our team is a remote-first cohort of brilliant researchers so dedicated to the mission they've joined us pre-funding to build the foundation.</p>
+                <div class="mt-10">
+                    <button id="open-contact-modal-button" class="px-8 py-3 rounded-lg btn-primary font-brand">Request to Join</button>
+                </div>
+                 <div class="mt-10">
+                    <a href="mailto:talent@culturiq.ai?subject=Career Inquiry" class="inline-block px-10 py-4 rounded-lg bg-zinc-800 text-white font-bold hover:bg-zinc-700 transition font-brand">
+                        Or Email Us Directly
+                    </a>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Contact Modal -->
+    <div id="contact-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 text-center">
+            <div id="contact-modal-backdrop" class="fixed inset-0 bg-black bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <div class="relative inline-block bg-white text-left rounded-lg shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+                <div class="bg-zinc-900 text-white rounded-lg p-8 border border-zinc-700">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold font-brand" id="modal-title">Let's Talk</h3>
+                        <button id="close-contact-modal-button" class="text-gray-400 hover:text-white text-3xl">&times;</button>
+                    </div>
+                    <p class="text-gray-400 mb-6">Have a question, idea, or request? Send us a message — we usually reply within 24 hours.</p>
+                    <form name="contact" method="POST" data-netlify="true" class="space-y-6">
+                        <input type="hidden" name="form-name" value="contact" />
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label for="contact-name" class="block text-sm font-medium text-gray-300">Name *</label>
+                                <input type="text" name="name" id="contact-name" placeholder="Your full name" required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)]">
+                            </div>
+                            <div>
+                                <label for="contact-email" class="block text-sm font-medium text-gray-300">Email *</label>
+                                <input type="email" name="email" id="contact-email" placeholder="your@email.com" required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)]">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="contact-organization" class="block text-sm font-medium text-gray-300">Organization *</label>
+                            <input type="text" name="organization" id="contact-organization" placeholder="Your company or institution" required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)]">
+                        </div>
+                        <div>
+                            <label for="contact-subject" class="block text-sm font-medium text-gray-300">Subject *</label>
+                            <select name="subject" id="contact-subject" required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)]">
+                                <option>Select a subject</option>
+                                <option>VC/Investor Inquiry</option>
+                                <option>NLDA Hackathon Inquiry</option>
+                                <option>Joining the Team</option>
+                                <option>Partnership Inquiry</option>
+                                <option>Research Collaboration</option>
+                                <option>General Question</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="contact-message" class="block text-sm font-medium text-gray-300">Message *</label>
+                            <textarea name="message" id="contact-message" placeholder="Tell us about your project, question, or how we can help..." required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)] h-32"></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full px-8 py-3 rounded-lg btn-primary font-brand">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800">
+        <div class="container mx-auto px-6 py-8">
+            <div class="md:flex md:justify-between items-center">
+                <div class="mb-6 md:mb-0">
+                    <a href="#" aria-label="Home">
+                        <img src="images/logo.png" class="h-8" alt="Culturiq Logo">
+                    </a>
+                    <p class="mt-2 text-gray-500">Building the Causal Foundation for ASI.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
+                    <div>
+                        <h2 class="mb-6 text-sm font-semibold text-gray-200 uppercase">Navigate</h2>
+                        <ul class="text-gray-400">
+                            <li class="mb-4"><a href="#vision" class="hover:text-[var(--brand-accent)]">Vision</a></li>
+                            <li class="mb-4"><a href="#technology" class="hover:text-[var(--brand-accent)]">Technology</a></li>
+                            <li><a href="#milestones" class="hover:text-[var(--brand-accent)]">Milestones</a></li>
+                            <li><a href="#labs" class="hover:text-[var(--brand-accent)]">Labs</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 class="mb-6 text-sm font-semibold text-gray-200 uppercase">Connect</h2>
+                        <ul class="text-gray-400">
+                            <li class="mb-4"><a href="https://www.linkedin.com/company/culturiq/" target="_blank" rel="noopener noreferrer" class="hover:text-[var(--brand-accent)]">LinkedIn</a></li>
+                            <li class="mb-4"><a href="https://www.youtube.com/@culturiqai" target="_blank" rel="noopener noreferrer" class="hover:text-[var(--brand-accent)]">YouTube</a></li>
+                            <li><a href="https://github.com/culturiqai/NLDA-SciChat" target="_blank" rel="noopener noreferrer" class="hover:text-[var(--brand-accent)]">GitHub</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h2 class="mb-6 text-sm font-semibold text-gray-200 uppercase">Legal</h2>
+                        <ul class="text-gray-400">
+                            <li class="mb-4"><a href="#" class="hover:text-[var(--brand-accent)]">Privacy Policy</a></li>
+                            <li><a href="#" class="hover:text-[var(--brand-accent)]">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 text-center">
+                <div class="flex justify-center space-x-6">
+                    <a href="https://www.linkedin.com/company/culturiq/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-[var(--brand-accent)]" aria-label="LinkedIn">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                    </a>
+                    <a href="https://www.youtube.com/@culturiqai" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-[var(--brand-accent)]" aria-label="YouTube">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                    </a>
+                    <a href="https://github.com/culturiqai/NLDA-SciChat" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-[var(--brand-accent)]" aria-label="GitHub">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.91 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                    </a>
+                </div>
+            </div>
+            <hr class="my-6 border-gray-700 sm:mx-auto lg:my-8" />
+            <div class="text-center text-gray-500">
+                &copy; 2025 Culturiq Research Labs. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple script for mobile menu toggle
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+                // Close mobile menu on link click
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+
+        // Netlify Form Submission for Main Contact Form
+        const contactForm = document.querySelector('#contact-modal form');
+        if (contactForm) {
+            contactForm.addEventListener('submit', e => {
+                e.preventDefault();
+
+                const formData = new FormData(contactForm);
+                const submitButton = contactForm.querySelector('button[type="submit"]');
+                const originalButtonText = submitButton.innerHTML;
+                submitButton.innerHTML = 'Sending...';
+                submitButton.disabled = true;
+
+                fetch('/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams(formData).toString()
+                })
+                .then(() => {
+                    contactForm.innerHTML = `<div class="text-center p-8"><h3 class="text-2xl font-bold text-[var(--brand-accent)]">Thank You!</h3><p class="text-gray-300 mt-2">Your message has been sent successfully. We'll get back to you soon.</p></div>`;
+                })
+                .catch(error => {
+                    alert('Sorry, there was an error sending your message. Please try again later.');
+                    submitButton.innerHTML = originalButtonText;
+                    submitButton.disabled = false;
+                });
+            });
+        }
+
+        // Modal Interaction Script
+        const contactModal = document.getElementById('contact-modal');
+        const openModalButton = document.getElementById('open-contact-modal-button');
+        const closeModalButton = document.getElementById('close-contact-modal-button');
+        const backdrop = document.getElementById('contact-modal-backdrop');
+
+        if (openModalButton) {
+            openModalButton.addEventListener('click', () => contactModal.classList.remove('hidden'));
+            closeModalButton.addEventListener('click', () => contactModal.classList.add('hidden'));
+            backdrop.addEventListener('click', () => contactModal.classList.add('hidden'));
+        }
+    </script>
+
+    <script>
+    // p5.js sketch for animated background
+    function sketch(p) {
+        let particles = [];
+        const numParticlesWide = 25;
+        const numParticlesHigh = 15;
+        const spacing = 60;
+        let phase = 0; // 0: waves, 1: coefficients, 2: manifold
+        let manifoldShape = 0; // 0: Torus, 1: Sphere, 2: Cylinder
+        let transitionTime = 0;
+        let angle = 0;
+
+        class Particle {
+            constructor(x, y) {
+                this.pos = p.createVector(x, y);
+                this.vel = p.createVector(0, 0);
+                this.acc = p.createVector(0, 0);
+                this.maxSpeed = 4;
+                this.maxForce = 0.2;
+                this.originalPos = p.createVector(x, y);
+                this.color = p.color('rgba(217, 255, 0, 0.5)'); // Increased opacity
+            }
+
+            applyForce(force) {
+                this.acc.add(force);
+            }
+
+            seek(target) {
+                let desired = p5.Vector.sub(target, this.pos);
+                desired.setMag(this.maxSpeed);
+                let steer = p5.Vector.sub(desired, this.vel);
+                steer.limit(this.maxForce);
+                this.applyForce(steer);
+            }
+
+            update() {
+                this.vel.add(this.acc);
+                this.vel.limit(this.maxSpeed);
+                this.pos.add(this.vel);
+                this.acc.mult(0);
+            }
+
+            show() {
+                p.stroke(this.color);
+                p.strokeWeight(3); // Increased size
+                p.point(this.pos.x, this.pos.y);
+            }
+        }
+
+        p.setup = function() {
+            let canvas = p.createCanvas(p.windowWidth, p.windowHeight);
+            canvas.parent('canvas-container');
+            
+            p.recreateParticles();
+            transitionTime = p.millis();
+        };
+
+        p.recreateParticles = function() {
+            particles = [];
+            let startX = p.width / 2 - (numParticlesWide * spacing) / 2;
+            let startY = p.height / 2 - (numParticlesHigh * spacing) / 2;
+
+            // Switched to row-major order for easier line drawing
+            for (let j = 0; j < numParticlesHigh; j++) {
+                for (let i = 0; i < numParticlesWide; i++) {
+                    particles.push(new Particle(startX + i * spacing, startY + j * spacing));
+                }
+            }
+        }
+
+        p.draw = function() {
+            p.clear();
+
+            if (p.millis() - transitionTime > 10000) {
+                phase = (phase + 1) % 3;
+                if (phase === 2) { // When entering manifold phase, switch to the next shape
+                    manifoldShape = (manifoldShape + 1) % 3;
+                }
+                transitionTime = p.millis();
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                let particle = particles[i];
+                let target;
+                let row = Math.floor(i / numParticlesWide);
+                let col = i % numParticlesWide;
+
+                if (phase === 0) { // Phase 1: Waves
+                    let waveX = particle.originalPos.x;
+                    let waveY = particle.originalPos.y + p.sin(particle.originalPos.x * 0.02 + p.frameCount * 0.03) * 30;
+                    target = p.createVector(waveX, waveY);
+                    particle.seek(target);
+                } else if (phase === 1) { // Phase 2: Coefficients
+                    let randomForce = p5.Vector.random2D().mult(0.5);
+                    particle.applyForce(randomForce);
+                } else { // Phase 3: Manifold - Now with multiple shapes
+                    if (manifoldShape === 0) { // Shape 1: Torus
+                        let r1 = p.min(p.width, p.height) * 0.2;
+                        let r2 = p.min(p.width, p.height) * 0.08;
+                        let u = p.map(col, 0, numParticlesWide, 0, p.TWO_PI);
+                        let v = p.map(row, 0, numParticlesHigh, 0, p.TWO_PI);
+                        
+                        let x = (r1 + r2 * p.cos(v)) * p.cos(u);
+                        let y = (r1 + r2 * p.cos(v)) * p.sin(u);
+                        let z = r2 * p.sin(v);
+                        
+                        // 3D rotation
+                        let rotX = y * p.sin(angle) + z * p.cos(angle);
+                        target = p.createVector(p.width/2 + x, p.height/2 + rotX);
+                    
+                    } else if (manifoldShape === 1) { // Shape 2: Sphere
+                        let r = p.min(p.width, p.height) * 0.25;
+                        let u = p.map(col, 0, numParticlesWide, 0, p.TWO_PI);
+                        let v = p.map(row, 0, numParticlesHigh, 0, p.PI);
+
+                        let x = r * p.sin(v) * p.cos(u);
+                        let y = r * p.sin(v) * p.sin(u);
+                        let z = r * p.cos(v);
+
+                        // 3D rotation
+                        let rotX = x * p.cos(angle) - z * p.sin(angle);
+                        let rotZ = x * p.sin(angle) + z * p.cos(angle);
+                        target = p.createVector(p.width/2 + rotX, p.height/2 + y);
+
+                    } else { // Shape 3: Cylinder
+                        let r = p.min(p.width, p.height) * 0.15;
+                        let h = p.min(p.width, p.height) * 0.4;
+                        let u = p.map(col, 0, numParticlesWide, 0, p.TWO_PI);
+                        let v_pos = p.map(row, 0, numParticlesHigh, -h/2, h/2);
+
+                        let x = r * p.cos(u);
+                        let y = v_pos;
+                        let z = r * p.sin(u);
+                        
+                        // 3D rotation
+                        let rotX = x * p.cos(angle) - z * p.sin(angle);
+                        target = p.createVector(p.width/2 + rotX, p.height/2 + y);
+                    }
+                    particle.seek(target);
+                }
+                
+                particle.update();
+            }
+
+            // Draw particles and lines separately to have lines underneath
+            p.strokeWeight(1);
+            p.stroke('rgba(217, 255, 0, 0.1)');
+
+            for (let i = 0; i < particles.length; i++) {
+                let row = Math.floor(i / numParticlesWide);
+                let col = i % numParticlesWide;
+
+                if (phase !== 1) { // Draw lines for waves and manifold
+                    // Connect horizontally
+                    if (col > 0) {
+                        p.line(particles[i].pos.x, particles[i].pos.y, particles[i-1].pos.x, particles[i-1].pos.y);
+                    }
+                    // Connect vertically
+                    if (row > 0) {
+                         p.line(particles[i].pos.x, particles[i].pos.y, particles[i-numParticlesWide].pos.x, particles[i-numParticlesWide].pos.y);
+                    }
+                }
+            }
+
+            // Draw particles on top of lines
+            for (let particle of particles) {
+                particle.show();
+            }
+
+            angle += 0.005;
+        };
+
+        p.windowResized = function() {
+            p.resizeCanvas(p.windowWidth, p.windowHeight);
+            p.recreateParticles();
+        };
+    }
+    new p5(sketch);
+
+    // p5.js sketch for the Founder Story manifold
+    function manifoldSketch(p) {
+        let particles = [];
+        const numParticles = 200;
+        let angle = 0;
+        let parentDiv;
+
+        class Particle {
+            constructor() {
+                this.pos = p.createVector(p.random(-50, 50), p.random(-50, 50), p.random(-50, 50));
+                this.target = p.createVector(0, 0, 0);
+                this.color = p.color('rgba(217, 255, 0, 0.6)');
+            }
+
+            update() {
+                this.pos.lerp(this.target, 0.05); // Smoothly move towards target
+            }
+
+            show() {
+                p.stroke(this.color);
+                p.strokeWeight(3);
+                p.point(this.pos.x, this.pos.y, this.pos.z);
+            }
+        }
+
+        p.setup = function() {
+            parentDiv = document.getElementById('manifold-canvas-container');
+            let canvas = p.createCanvas(parentDiv.offsetWidth, parentDiv.offsetHeight, p.WEBGL);
+            canvas.parent('manifold-canvas-container');
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle());
+            }
+        };
+
+        p.draw = function() {
+            p.clear();
+            p.orbitControl(2, 2, 0.05); // Allow mouse interaction
+            p.rotateY(angle);
+            p.rotateX(angle / 2);
+
+            let r = p.min(p.width, p.height) * 0.4;
+            
+            for (let i = 0; i < particles.length; i++) {
+                let particle = particles[i];
+                let u = p.map(i, 0, numParticles, 0, p.TWO_PI);
+                let v = p.map(p.noise(i * 0.1, p.frameCount * 0.001), 0, 1, 0, p.PI); // Organic distribution
+
+                particle.target.x = r * p.sin(v) * p.cos(u);
+                particle.target.y = r * p.sin(v) * p.sin(u);
+                particle.target.z = r * p.cos(v);
+                
+                particle.update();
+                particle.show();
+            }
+
+            p.stroke('rgba(217, 255, 0, 0.1)');
+            p.strokeWeight(1);
+            p.noFill();
+            p.sphere(r);
+
+
+            angle += 0.003;
+        };
+        
+        p.windowResized = function() {
+            p.resizeCanvas(parentDiv.offsetWidth, parentDiv.offsetHeight);
+        };
+    }
+    new p5(manifoldSketch);
+    </script>
+</body>
+</html>

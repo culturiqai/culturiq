@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HRF: 100x Acceleration | Culturiq Research</title>
+    <meta name="description" content="An in-depth look at HRF (Harmonic Resonance Framework), our patent-pending spectral method for accelerating physics simulations and compressing neural networks.">
+    <link rel="icon" href="images/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-accent: #d9ff00; /* Vibrant Lime/Chartreuse */
+            --brand-accent-light: #e5ff58;
+            --brand-text: #f0f0f0;
+            --brand-dark-bg: #0a0a0a;
+            --brand-dark-card: #111111;
+            
+            --glow-color-primary: rgba(217, 255, 0, 0.7);
+            --glow-color-secondary: rgba(217, 255, 0, 0.5);
+            --grid-color: rgba(217, 255, 0, 0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--brand-dark-bg);
+            color: var(--brand-text);
+        }
+        h1, h2, h3, h4, .font-brand {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .text-glow {
+            text-shadow: 0 0 8px rgba(217, 255, 0, 0.3), 0 0 20px rgba(217, 255, 0, 0.2);
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--brand-accent);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: var(--brand-accent);
+            color: var(--brand-dark-bg);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .section-title {
+           font-weight: 900;
+           letter-spacing: -0.025em;
+           font-family: 'Roboto Mono', monospace;
+        }
+        .card-border-glow {
+            position: relative;
+            background-color: var(--brand-dark-card);
+            border: 1px solid rgba(217, 255, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .card-border-glow:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 0.75rem;
+            border: 1px solid transparent;
+            background: linear-gradient(120deg, var(--glow-color-secondary), transparent, var(--glow-color-secondary)) border-box;
+            -webkit-mask:
+                linear-gradient(#fff 0 0) padding-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .card-border-glow:hover:before {
+            opacity: 1;
+        }
+        .card-border-glow:hover {
+            transform: translateY(-5px);
+            border-color: rgba(217, 255, 0, 0.4);
+            box-shadow: 0 10px 30px -15px rgba(217, 255, 0, 0.2);
+        }
+        .bg-grid {
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .aspect-video {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        .aspect-video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="web.html" class="text-2xl font-black text-white font-brand flex items-center">
+                <img src="images/logo.png" alt="Culturiq Logo" class="h-8 inline-block mr-2">
+                <span>cultur<span class="text-[var(--brand-accent)]">iq</span></span>
+            </a>
+            <nav class="hidden md:flex space-x-8 text-gray-300">
+                <a href="web.html#vision" class="nav-link">Vision</a>
+                <a href="web.html#technology" class="nav-link">Technology</a>
+                <a href="web.html#milestones" class="nav-link">Milestones</a>
+                <a href="web.html#labs" class="nav-link">Labs</a>
+                <a href="web.html#team" class="nav-link">Team</a>
+            </nav>
+            <a href="web.html#join-us" class="hidden md:inline-block px-6 py-2 rounded-lg btn-primary font-brand">
+                Contact
+            </a>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <!-- Hero Section with Animation -->
+        <section id="hero" class="py-20 text-center relative overflow-hidden" style="height: 400px;">
+            <div id="hrf-animation-container" class="absolute inset-0 z-0 bg-black opacity-90"></div>
+            <div class="container mx-auto px-6 relative z-10 flex flex-col items-center justify-center h-full">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight text-glow">
+                    <span class="text-[var(--brand-accent)]">HRF:</span> 100x Acceleration
+                </h1>
+                <p class="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-gray-400" style="text-shadow: 0 1px 3px rgba(0,0,0,0.5);">Condensing complexity into its essence. Accelerating discovery.</p>
+            </div>
+        </section>
+
+        <!-- Bottleneck Section -->
+        <section id="bottleneck" class="py-20 bg-black">
+            <div class="container mx-auto px-6">
+                <div class="lg:flex lg:items-center lg:gap-16">
+                    <!-- Left Column: Text -->
+                    <div class="lg:w-1/2">
+                        <h2 class="text-3xl md:text-5xl section-title text-white">The Computational Bottleneck</h2>
+                        <p class="mt-6 text-lg md:text-xl text-gray-400">In fields from climate science to artificial intelligence, we have hit a computational wall. Simulating complex systems or training state-of-the-art AI models requires processing billions of data points, demanding immense memory and processing power. This bottleneck makes real-time applications, large-scale discovery, and deployment on everyday devices impractical, creating a fundamental tension between the sophistication of our questions and our ability to answer them.</p>
+                    </div>
+                    <!-- Right Column: Animation -->
+                    <div class="mt-12 lg:mt-0 lg:w-1/2">
+                        <div id="bottleneck-animation-container" style="height: 400px;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Coefficients Section -->
+        <section id="coefficients" class="py-20 bg-grid">
+            <div class="container mx-auto px-6 max-w-4xl text-center">
+                <h2 class="text-3xl md:text-5xl section-title text-[var(--brand-accent)]">Finding the High-Energy Coefficients</h2>
+                <p class="mt-6 text-lg md:text-xl text-gray-400">The core insight of HRF is that in any complex system, the essential information is concentrated in a small, core set of "high-energy" components within its spectral representation. While traditional methods process every single data point, HRF mathematically transforms the problem to instantly identify and isolate these critical components, which often make up less than 1% of the total data.</p>
+                <p class="mt-4 text-lg md:text-xl text-gray-400">Think of it like listening to a symphony. The beautiful melody is defined by a specific combination of key notes and recurring patterns, not every possible sound played at once. HRF acts as a form of "musical shorthand" for computation; it learns the fundamental notes and harmonic patterns that define the entire piece, allowing it to reconstruct the result with incredible speed and accuracy, achieving results in minutes that once took days.</p>
+                
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <!-- Left Animation: Noisy Wave -->
+                    <div>
+                        <div id="noisy-wave-container" class="rounded-lg bg-black/50 border border-zinc-700" style="height: 200px;"></div>
+                        <p class="mt-2 text-sm text-gray-500">The Full Computation (Noise)</p>
+                    </div>
+                    <!-- Right Animation: Clean Wave -->
+                    <div>
+                        <div id="clean-wave-container" class="rounded-lg bg-black/50 border border-zinc-700" style="height: 200px;"></div>
+                        <p class="mt-2 text-sm text-gray-500">The HRF Essence (Signal)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Applications Section -->
+        <section id="applications" class="py-20 bg-black/30">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl md:text-5xl section-title text-white">Applications and Impact</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-400">HRF is a domain-agnostic framework that unlocks new capabilities across a wide range of computationally intensive fields.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Physics Card -->
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <img src="images/HRF_Physics.jpeg" alt="Physics Simulation of fluid dynamics in a city" class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-xl font-bold text-white">Physics Simulation</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">Harnessing HRF, we can accelerate complex physics simulations for fluid dynamics, material science, and environmental modeling by over 100x. This enables higher-resolution flood simulations for urban planning, faster discovery of new materials, and more detailed climate models, providing critical insights on a vastly accelerated timeline.</p>
+                    </div>
+                    <!-- NN Compression Card -->
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <img src="images/NNhrf.jpeg" alt="Neural Network being compressed onto a chip" class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-xl font-bold text-white">Neural Network Compression</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">HRF redefines the possibilities for AI. Our native compression technology has achieved a landmark <strong>32.97x parameter reduction</strong> on neural networks—compressing a 3.2 million parameter model down to just 98,000—while simultaneously <strong>improving its performance</strong>. This makes it possible to run powerful, sophisticated AI models efficiently on edge devices, smartphones, and other resource-constrained hardware, democratizing access to next-generation AI.</p>
+                    </div>
+                    <!-- Causal Discovery Card -->
+                    <div class="p-6 rounded-xl card-border-glow flex flex-col">
+                        <img src="images/causal_hrf.jpeg" alt="Graph network representing causal discovery" class="rounded-lg mb-4 w-full h-48 object-cover">
+                        <h3 class="text-xl font-bold text-white">Real-Time Causal Discovery</h3>
+                        <p class="mt-2 text-gray-400 flex-grow">The unprecedented speed of HRF enables a new frontier of analytics: real-time causal discovery. By running complex "what-if" scenarios at interactive speeds, businesses and researchers can move beyond simple correlation to understand the true drivers of their systems. This capability, powered by HRF's core reasoning process, accelerates discovery and enables more confident, data-driven decision-making.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Section -->
+        <section id="hrf-in-action" class="py-20">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <div class="text-center mb-12">
+                     <h2 class="text-3xl md:text-5xl section-title text-white">HRF in Action</h2>
+                </div>
+                <div class="aspect-video rounded-xl overflow-hidden shadow-2xl shadow-black/50 border border-zinc-700">
+                    <iframe 
+                        src="https://www.youtube.com/embed/hZS6EUMqKGA" 
+                        title="YouTube video player"
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Back Button Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                     <a href="web.html#technology" class="inline-block px-8 py-3 rounded-lg bg-zinc-800 text-white font-bold hover:bg-zinc-700 transition">Back to Technologies</a>
+                </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800">
+        <!-- ... Footer content copied from web.html for consistency ... -->
+    </footer>
+
+    <script>
+    // p5.js sketch for HRF "funnel" animation
+    function hrfSketch(p) {
+        let particles = [];
+        const numParticles = 500; // Increased particle count
+        let funnelX;
+        let funnelY;
+        let canvas;
+
+        class Particle {
+            constructor() {
+                this.pos = p.createVector(p.random(0, p.width / 3), p.random(p.height));
+                this.vel = p5.Vector.random2D().mult(p.random(1, 2.5)); // More initial velocity
+                this.acc = p.createVector(0, 0);
+                this.maxSpeed = 4;
+                this.history = [];
+            }
+
+            update() {
+                this.vel.add(this.acc);
+                this.vel.limit(this.maxSpeed);
+                this.pos.add(this.vel);
+                this.acc.mult(0);
+
+                this.history.push(this.pos.copy());
+                if (this.history.length > 30) {
+                    this.history.splice(0, 1);
+                }
+            }
+
+            applyBehaviors() {
+                let funnelPoint = p.createVector(funnelX, funnelY);
+                
+                if (this.pos.x < funnelX) {
+                    // Chaotic phase on the left
+                    let noiseForce = p.createVector(p.noise(this.pos.x * 0.01, this.pos.y * 0.01, p.frameCount * 0.01) - 0.5, p.noise(this.pos.y * 0.01, this.pos.x * 0.01, p.frameCount * 0.01) - 0.5);
+                    noiseForce.mult(0.5);
+                    this.applyForce(noiseForce);
+
+                    // Funneling force
+                    let steer = p5.Vector.sub(funnelPoint, this.pos);
+                    let distance = steer.mag();
+                    let strength = p.map(distance, 0, p.width / 2, 0.5, 0.05);
+                    steer.setMag(strength);
+                    this.applyForce(steer);
+                    this.maxSpeed = 4;
+
+                } else {
+                    // Beam phase on the right - seek a point far off-screen
+                    let target = p.createVector(p.width + 200, funnelY);
+                    let desired = p5.Vector.sub(target, this.pos);
+                    desired.normalize();
+                    desired.mult(15); // High speed for the beam
+                    let steer = p5.Vector.sub(desired, this.vel);
+                    steer.limit(1.5); // Strong steering force
+                    this.applyForce(steer);
+                    this.maxSpeed = 15;
+                }
+            }
+
+            applyForce(force) {
+                this.acc.add(force);
+            }
+
+            show() {
+                let textCenter = p.createVector(p.width / 2, p.height / 2);
+                let dist = this.pos.dist(textCenter);
+                let textZoneRadius = 100; // Radius where fade starts
+                let fadeZoneWidth = 60;   // How far out the fade effect extends
+
+                let alphaMultiplier = 1.0;
+                if (dist < textZoneRadius + fadeZoneWidth) {
+                    // Map distance to an alpha multiplier (0 to 1)
+                    alphaMultiplier = p.map(dist, textZoneRadius, textZoneRadius + fadeZoneWidth, 0, 1.0);
+                    alphaMultiplier = p.constrain(alphaMultiplier, 0, 1);
+                }
+
+                if (alphaMultiplier <= 0) return; // Don't draw if fully faded
+
+                p.noFill();
+                p.beginShape();
+                for (let i = 0; i < this.history.length; i++) {
+                    let pos = this.history[i];
+                    let baseAlpha = p.map(i, 0, this.history.length, 0, 255 * 0.7);
+                    p.stroke(217, 255, 0, baseAlpha * alphaMultiplier);
+                    p.strokeWeight(1.5);
+                    p.vertex(pos.x, pos.y);
+                }
+                p.endShape();
+            }
+
+            edges() {
+                if (this.pos.x > p.width + 50 || this.pos.y > p.height + 50 || this.pos.y < -50) {
+                    this.history = [];
+                    this.pos = p.createVector(p.random(0, p.width / 3), p.random(p.height));
+                    this.vel = p5.Vector.random2D().mult(p.random(1, 2.5));
+                }
+                 if (this.pos.x < -50) {
+                    this.history = [];
+                    this.pos = p.createVector(p.random(0, p.width / 3), p.random(p.height));
+                    this.vel = p5.Vector.random2D().mult(p.random(1, 2.5));
+                }
+            }
+        }
+
+        p.setup = function() {
+            let container = document.getElementById('hrf-animation-container');
+            if (!container) return;
+            canvas = p.createCanvas(container.offsetWidth, container.offsetHeight);
+            canvas.parent('hrf-animation-container');
+
+            funnelX = p.width / 1.9; // Funnel point shifted to the right
+            funnelY = p.height / 2;
+
+            for (let i = 0; i < numParticles; i++) {
+                particles.push(new Particle());
+            }
+            
+            p.drawingContext.shadowBlur = 8;
+            p.drawingContext.shadowColor = 'rgba(217, 255, 0, 0.5)';
+        };
+
+        p.draw = function() {
+            p.background(10, 10, 10, 255); // Opaque background
+
+            for (let particle of particles) {
+                particle.applyBehaviors();
+                particle.update();
+                particle.show();
+                particle.edges();
+            }
+        };
+        
+        p.windowResized = function() {
+            let container = document.getElementById('hrf-animation-container');
+             if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+            funnelX = p.width / 1.9;
+            funnelY = p.height / 2;
+        };
+    }
+    new p5(hrfSketch);
+
+    // p5.js sketch for Bottleneck "wall" animation
+    function bottleneckSketch(p) {
+        let nodes = [];
+        let streams = [];
+        const numNodes = 150;
+        const numStreams = 40;
+
+        class Node {
+            constructor() {
+                this.pos = p.createVector(p.random(p.width * 0.4, p.width * 0.6), p.random(p.height));
+                this.isStressed = p.random(1) < 0.1; // 10% chance of being a stress point
+                this.stressPulse = p.random(p.TWO_PI);
+            }
+
+            show() {
+                if (this.isStressed) {
+                    let alpha = p.map(p.sin(this.stressPulse + p.frameCount * 0.05), -1, 1, 50, 150);
+                    p.fill(255, 0, 0, alpha);
+                    p.noStroke();
+                    p.circle(this.pos.x, this.pos.y, 4);
+                } else {
+                    p.fill(100);
+                    p.noStroke();
+                    p.circle(this.pos.x, this.pos.y, 2);
+                }
+            }
+        }
+
+        class Stream {
+            constructor() {
+                this.pos = p.createVector(p.random(-10, p.width * 0.2), p.random(p.height));
+                this.vel = p.createVector(p.random(2, 4), 0);
+                this.history = [];
+            }
+
+            update() {
+                this.pos.add(this.vel);
+                this.history.push(this.pos.copy());
+                if(this.history.length > 20) {
+                    this.history.splice(0, 1);
+                }
+            }
+            
+            checkCollision() {
+                for (let node of nodes) {
+                    if (this.pos.dist(node.pos) < 15) {
+                        this.reset();
+                        return;
+                    }
+                }
+                if(this.pos.x > p.width * 0.65) {
+                    this.reset();
+                }
+            }
+
+            reset() {
+                this.history = [];
+                this.pos.x = p.random(-10, p.width * 0.2);
+                this.pos.y = p.random(p.height);
+            }
+
+            show() {
+                p.noFill();
+                p.beginShape();
+                for (let i = 0; i < this.history.length; i++) {
+                    let pos = this.history[i];
+                    let alpha = p.map(i, 0, this.history.length, 0, 150);
+                    p.stroke(217, 255, 0, alpha);
+                    p.strokeWeight(1);
+                    p.vertex(pos.x, pos.y);
+                }
+                p.endShape();
+            }
+        }
+
+        p.setup = function() {
+            let container = document.getElementById('bottleneck-animation-container');
+            if (!container) return;
+            p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
+            
+            for (let i = 0; i < numNodes; i++) {
+                nodes.push(new Node());
+            }
+            for (let i = 0; i < numStreams; i++) {
+                streams.push(new Stream());
+            }
+        };
+
+        p.draw = function() {
+            p.clear();
+            
+            // Draw connections
+            p.stroke(50);
+            p.strokeWeight(0.5);
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    if (nodes[i].pos.dist(nodes[j].pos) < 80) {
+                        p.line(nodes[i].pos.x, nodes[i].pos.y, nodes[j].pos.x, nodes[j].pos.y);
+                    }
+                }
+            }
+            
+            nodes.forEach(n => n.show());
+            streams.forEach(s => {
+                s.update();
+                s.show();
+                s.checkCollision();
+            });
+        };
+        
+        p.windowResized = function() {
+            let container = document.getElementById('bottleneck-animation-container');
+            if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+            nodes = [];
+             for (let i = 0; i < numNodes; i++) {
+                nodes.push(new Node());
+            }
+        };
+    }
+    new p5(bottleneckSketch);
+
+    // p5.js sketch for Noisy Waveform
+    function noisyWaveSketch(p) {
+        p.setup = function() {
+            let container = document.getElementById('noisy-wave-container');
+            if (!container) return;
+            p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
+        };
+
+        p.draw = function() {
+            p.background(10, 10, 10);
+            p.noFill();
+            p.stroke(100, 100, 100); // Muted color
+            p.strokeWeight(1.5);
+
+            p.beginShape();
+            for (let x = 0; x < p.width; x++) {
+                let noiseVal = p.noise(x * 0.02, p.frameCount * 0.01);
+                let y = p.map(noiseVal, 0, 1, p.height * 0.2, p.height * 0.8);
+                
+                // Add some high-frequency jitter
+                let jitter = p.random(-5, 5);
+                p.vertex(x, y + jitter);
+            }
+            p.endShape();
+        };
+
+        p.windowResized = function() {
+            let container = document.getElementById('noisy-wave-container');
+            if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+        };
+    }
+    new p5(noisyWaveSketch);
+
+    // p5.js sketch for Clean Waveform
+    function cleanWaveSketch(p) {
+        p.setup = function() {
+            let container = document.getElementById('clean-wave-container');
+            if (!container) return;
+            p.createCanvas(container.offsetWidth, container.offsetHeight).parent(container);
+            p.drawingContext.shadowBlur = 12;
+            p.drawingContext.shadowColor = 'rgba(217, 255, 0, 0.5)';
+        };
+
+        p.draw = function() {
+            p.background(10, 10, 10);
+            p.noFill();
+            p.stroke(217, 255, 0); // Bright brand color
+            p.strokeWeight(2);
+
+            p.beginShape();
+            for (let x = 0; x < p.width; x++) {
+                // Sum of two clean sine waves
+                let y1 = p.sin(x * 0.02 + p.frameCount * 0.02) * (p.height / 8);
+                let y2 = p.sin(x * 0.05 + p.frameCount * 0.02) * (p.height / 10);
+                let y = p.height / 2 + y1 + y2;
+                p.vertex(x, y);
+            }
+            p.endShape();
+        };
+
+        p.windowResized = function() {
+            let container = document.getElementById('clean-wave-container');
+            if (!container) return;
+            p.resizeCanvas(container.offsetWidth, container.offsetHeight);
+        };
+    }
+    new p5(cleanWaveSketch);
+
+    </script>
+</body>
+</html> 

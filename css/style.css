@@ -1,0 +1,408 @@
+/* 
+   Culturiq Website Stylesheet
+   Inspired by Google DeepMind - Clean, Professional, Authoritative
+*/
+
+/* 1. Global Resets and Font Imports */
+:root {
+    --bg-color: #121212;
+    --surface-color: #1e1e1e;
+    --primary-text-color: #EAEAEA;
+    --secondary-text-color: #A0A0A0;
+    --accent-color: #AFFF33;
+    --border-color: #333333;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--primary-text-color);
+    margin: 0;
+    line-height: 1.6;
+    scroll-behavior: smooth;
+}
+
+a {
+    color: var(--primary-text-color);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--accent-color);
+}
+
+h1, h2, h3, h4 {
+    margin: 0;
+    font-weight: 500;
+}
+
+/* 2. Animation Keyframes */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-on-load,
+.fade-in-up {
+    opacity: 0;
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-load.is-visible {
+    animation: fadeInUp 0.8s ease-out forwards;
+    animation-delay: var(--delay, 0s);
+}
+
+.fade-in-up.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* 3. Header and Navigation */
+.main-header {
+    background-color: rgba(18, 18, 18, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 5%;
+    position: fixed;
+    width: 90%;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logo img {
+    height: 40px;
+    width: auto;
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 2.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.main-nav a {
+    color: var(--primary-text-color);
+    font-weight: 500;
+}
+
+/* 4. Main Content & Sections */
+main {
+    padding-top: 65px; /* Height of header */
+}
+
+section {
+    padding: 5rem 5%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.section-header p {
+    font-size: 1.1rem;
+    color: var(--secondary-text-color);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* 5. Hero Section (Split-Screen Sticky Layout) */
+.hero-section-split {
+    display: flex;
+    align-items: flex-start;
+    gap: 2rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+.hero-sticky-left {
+    flex: 1;
+    position: sticky;
+    top: 80px; /* Header height + some padding */
+    height: calc(100vh - 100px); /* Full height minus header and padding */
+}
+
+.hero-main-story {
+    background-color: var(--surface-color);
+    border-radius: 16px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.hero-video-placeholder {
+    flex-grow: 1;
+    background-color: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--secondary-text-color);
+    border-radius: 16px 16px 0 0;
+    overflow: hidden; /* Ensures video respects border radius */
+}
+
+.hero-video-placeholder video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures video covers the area without distortion */
+}
+
+.story-content {
+    padding: 2rem;
+}
+
+.story-content h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.hero-scroll-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.side-story {
+    background-color: var(--surface-color);
+    padding: 1.5rem;
+    border-radius: 16px;
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.side-story-text {
+    flex: 1;
+}
+
+.side-story-image {
+    width: 100px;
+    height: 100px;
+    flex-shrink: 0;
+    background-color: #333;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+}
+
+.side-story h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.learn-more {
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.learn-more.internal-link {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* 6. Research Section */
+.research-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.research-card {
+    background-color: var(--surface-color);
+    padding: 2rem;
+    border-radius: 16px;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.research-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+.card-icon-placeholder {
+    width: 40px;
+    height: 40px;
+    background-color: var(--accent-color);
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    opacity: 0.2;
+}
+
+.research-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+/* 7. Applications Section */
+.applications-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.application-card {
+    background-color: var(--surface-color);
+    padding: 2rem;
+    border-radius: 16px;
+    border-top: 4px solid var(--accent-color);
+}
+
+.application-card h4 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+
+/* 8. Validation Section */
+.validation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.validation-item {
+    background-color: var(--surface-color);
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+}
+
+.validation-item span {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--secondary-text-color);
+    margin-bottom: 0.5rem;
+}
+
+.validation-item p {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.7;
+}
+
+/* 9. Team Section */
+.team-grid-expanded {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 1.5rem;
+    align-items: flex-start;
+}
+
+.team-member-card, .team-member-card-large {
+    background-color: var(--surface-color);
+    padding: 2rem;
+    border-radius: 16px;
+    height: 100%;
+}
+
+.team-member-card h4 {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.team-member-card p {
+    color: var(--secondary-text-color);
+    margin: 0;
+}
+
+.team-member-card-large h3 {
+     font-size: 1.8rem;
+}
+
+.team-member-card-large .bio {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--secondary-text-color);
+}
+
+
+/* 10. Footer */
+.main-footer {
+    background-color: var(--surface-color);
+    padding-top: 4rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1.5fr;
+    gap: 3rem;
+    padding-bottom: 4rem;
+}
+
+.footer-logo span {
+    color: var(--secondary-text-color);
+    font-size: 0.9rem;
+}
+
+.footer-links {
+    display: flex;
+    gap: 4rem;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links a {
+    color: var(--secondary-text-color);
+}
+
+.footer-subscribe form {
+    display: flex;
+}
+
+.footer-subscribe input {
+    flex-grow: 1;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    color: var(--primary-text-color);
+    padding: 0.75rem;
+    border-radius: 8px 0 0 8px;
+}
+
+.footer-subscribe button {
+    background: var(--accent-color);
+    border: none;
+    color: #000;
+    padding: 0.75rem 1rem;
+    font-size: 1.2rem;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+}
+
+.footer-bottom {
+    border-top: 1px solid var(--border-color);
+    text-align: center;
+    padding: 1.5rem 0;
+    color: var(--secondary-text-color);
+    font-size: 0.9rem;
+} 

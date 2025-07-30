@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NLDA for Biotech | Culturiq Research</title>
+    <meta name="description" content="Discover Molecules with AI That Explains Itself. The world's first fully integrated, explainable docking platform.">
+    <link rel="icon" href="images/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-accent: #d9ff00; /* Vibrant Lime/Chartreuse */
+            --brand-accent-light: #e5ff58;
+            --brand-text: #f0f0f0;
+            --brand-dark-bg: #0a0a0a;
+            --brand-dark-card: #111111;
+            
+            --glow-color-primary: rgba(217, 255, 0, 0.7);
+            --glow-color-secondary: rgba(217, 255, 0, 0.5);
+            --grid-color: rgba(217, 255, 0, 0.1);
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--brand-dark-bg);
+            color: var(--brand-text);
+        }
+        h1, h2, h3, h4, .font-brand {
+            font-family: 'Roboto Mono', monospace;
+        }
+        .text-glow {
+            text-shadow: 0 0 8px var(--glow-color-primary), 0 0 20px var(--glow-color-secondary);
+        }
+        .bg-grid {
+            background-image:
+                linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
+                linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+        .nav-link:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--brand-accent);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover:after {
+            width: 100%;
+        }
+        .btn-primary {
+            background-color: var(--brand-accent);
+            color: var(--brand-dark-bg);
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: var(--brand-accent-light);
+            box-shadow: 0 0 15px var(--glow-color-secondary);
+        }
+        .section-title {
+           font-weight: 900;
+           letter-spacing: -0.025em;
+           font-family: 'Roboto Mono', monospace;
+        }
+        .card-border-glow {
+            position: relative;
+            background-color: var(--brand-dark-card);
+            border: 1px solid rgba(217, 255, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        .card-border-glow:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 0.75rem;
+            border: 1px solid transparent;
+            background: linear-gradient(120deg, var(--glow-color-secondary), transparent, var(--glow-color-secondary)) border-box;
+            -webkit-mask:
+                linear-gradient(#fff 0 0) padding-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .card-border-glow:hover:before {
+            opacity: 1;
+        }
+        .aspect-video {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+        }
+        .aspect-video iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="bg-grid">
+
+    <!-- Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-black/50 backdrop-blur-lg border-b border-gray-800">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="web.html" class="text-2xl font-black text-white font-brand flex items-center">
+                <img src="images/logo.png" alt="Culturiq Logo" class="h-8 inline-block mr-2">
+                <span>cultur<span class="text-[var(--brand-accent)]">iq</span></span>
+            </a>
+            <nav class="hidden md:flex space-x-8 text-gray-300">
+                <a href="web.html" class="nav-link">Home</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pt-24">
+        <!-- Hero Section -->
+        <section class="py-20 text-center">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <p class="text-2xl font-bold text-[var(--brand-accent)]">Revolutionary Molecular Discovery</p>
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight mt-2">
+                    The Future of Drug Discovery
+                </h1>
+                <p class="mt-8 text-lg md:text-xl text-gray-400">Discover Molecules with AI That Explains Itself. The world's first fully integrated docking platform. Eliminate tool fragmentation. Improve cost, quality, delivery, and productivity — with scientific reasoning and FDA-aligned traceability built in.</p>
+            </div>
+        </section>
+
+        <!-- Animation Section -->
+        <section class="py-20 relative overflow-hidden" style="height: 400px;">
+            <div id="dna-animation-container" class="absolute inset-0 z-0 bg-black opacity-90"></div>
+            <div class="container mx-auto px-6 relative z-10 flex flex-col items-center justify-center h-full">
+                 <h2 class="text-3xl md:text-5xl section-title text-white text-center">Visualizing Molecular Dynamics</h2>
+                 <p class="mt-4 max-w-2xl mx-auto text-lg text-gray-400 text-center">Our platform moves beyond static numbers, allowing you to interact with and visualize complex biological structures in real-time.</p>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="py-20">
+            <div class="container mx-auto px-6 max-w-5xl">
+                <h2 class="text-3xl md:text-5xl section-title text-white text-center">AI That Doesn't Just Predict. It Explains.</h2>
+                <p class="mt-6 text-lg md:text-xl text-gray-400 text-center">From prompt to insight - in seconds.</p>
+                <div class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+                    
+                    <div class="p-8 rounded-xl card-border-glow">
+                        <h3 class="text-2xl font-bold text-white flex items-center">
+                            <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                            Conversational Interface
+                        </h3>
+                        <p class="mt-4 text-gray-400">Ask "Find peptide that binds to HLA-DRB1" and get complete molecular analysis in seconds. No coding required.</p>
+                    </div>
+                    <div class="p-8 rounded-xl card-border-glow">
+                        <h3 class="text-2xl font-bold text-white flex items-center">
+                             <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Real-Time Docking
+                        </h3>
+                        <p class="mt-4 text-gray-400">Powered by industry-standard molecular docking engines, our platform delivers production-ready, publication-quality results faster than any competitor.</p>
+                    </div>
+                    <div class="p-8 rounded-xl card-border-glow">
+                        <h3 class="text-2xl font-bold text-white flex items-center">
+                            <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            Explainable AI
+                        </h3>
+                        <p class="mt-4 text-gray-400">Every decision is documented and explainable with a complete reasoning chain - perfect for FDA submissions and peer review.</p>
+                    </div>
+                    <div class="p-8 rounded-xl card-border-glow">
+                        <h3 class="text-2xl font-bold text-white flex items-center">
+                            <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path></svg>
+                            Complete Pipeline
+                        </h3>
+                        <p class="mt-4 text-gray-400">Integrates Large Language Models with powerful engines for symbolic regression, 3D molecular visualization, and physics simulation into one unified, end-to-end automated discovery workflow.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Section -->
+        <section id="nlda-in-action" class="py-20">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <div class="text-center mb-12">
+                     <h2 class="text-3xl md:text-5xl section-title text-white">NLDA for Biotech in Action</h2>
+                     <p class="mt-6 text-lg text-gray-400">Watch how our platform revolutionizes peptide-based drug discovery through conversational AI, accelerating the process by 80%.</p>
+                </div>
+                <div class="aspect-video rounded-xl overflow-hidden shadow-2xl shadow-black/50 border border-zinc-700">
+                    <iframe 
+                        src="https://www.youtube.com/embed/nsgl4ruZzsg" 
+                        title="YouTube video player"
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+        </section>
+
+        <!-- Early Access Section -->
+        <section id="early-access" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-5xl section-title text-white">Register for Early Access</h2>
+                <p class="mt-4 max-w-2xl mx-auto text-gray-400">Join the molecular discovery revolution. Sign up to get early access to the NLDA for Biotech platform and start discovering breakthrough compounds today.</p>
+                <div class="mt-10">
+                    <button id="open-modal-button" class="px-8 py-3 rounded-lg btn-primary font-brand">Request Early Access</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Early Access Modal -->
+    <div id="early-access-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen px-4 text-center">
+            <!-- Backdrop -->
+            <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- Modal Content -->
+            <div class="relative inline-block bg-white text-left rounded-lg shadow-xl transform transition-all sm:my-8 sm:max-w-lg sm:w-full">
+                <div class="bg-zinc-900 text-white rounded-lg p-8 border border-zinc-700">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold font-brand" id="modal-title">Let's Talk</h3>
+                        <button id="close-modal-button" class="text-gray-400 hover:text-white">&times;</button>
+                    </div>
+                    <p class="text-gray-400 mb-6">Have a question, idea, or request? Send us a message — we usually reply within 24 hours.</p>
+                    <form name="biotech-early-access" method="POST" data-netlify="true" class="space-y-6">
+                        <input type="hidden" name="form-name" value="biotech-early-access" />
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-300">Name *</label>
+                                <input type="text" name="name" id="name" placeholder="Your full name" required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)]">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-300">Email *</label>
+                                <input type="email" name="email" id="email" placeholder="your@email.com" required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)]">
+                            </div>
+                        </div>
+                        <div>
+                            <label for="organization" class="block text-sm font-medium text-gray-300">Organization *</label>
+                            <input type="text" name="organization" id="organization" placeholder="Your company or institution" required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)]">
+                        </div>
+                        <div>
+                            <label for="subject" class="block text-sm font-medium text-gray-300">Subject *</label>
+                            <select name="subject" id="subject" required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)]">
+                                <option>Select a subject</option>
+                                <option>Partnership Inquiry</option>
+                                <option>Platform Demo Request</option>
+                                <option>Research Collaboration</option>
+                                <option>General Question</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="message" class="block text-sm font-medium text-gray-300">Message *</label>
+                            <textarea name="message" id="message" placeholder="Tell us about your project, question, or how we can help..." required class="mt-1 w-full p-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder-gray-500 focus:ring-2 focus:ring-[var(--brand-accent)] focus:border-[var(--brand-accent)] h-32"></textarea>
+                        </div>
+                        <div>
+                            <button type="submit" class="w-full px-8 py-3 rounded-lg btn-primary font-brand">Send Message</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800">
+        <div class="container mx-auto px-6 py-8">
+            <div class="text-center text-gray-500">
+                &copy; 2025 Culturiq Research Labs. All Rights Reserved.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    function dnaSketch(p) {
+        let angle = 0;
+        const radius = 80;
+        const numRungs = 50;
+        const rungSpacing = 20;
+
+        class Particle {
+            constructor() {
+                this.pos = p.createVector(p.random(-p.width/2, p.width/2), p.random(-p.height/2, p.height/2), p.random(-p.width, p.width));
+                this.vel = p5.Vector.random3D().mult(p.random(0.5, 1.5));
+                this.size = p.random(2, 4);
+            }
+
+            update() {
+                this.pos.add(this.vel);
+                if (this.pos.x < -p.width/2 || this.pos.x > p.width/2) this.vel.x *= -1;
+                if (this.pos.y < -p.height/2 || this.pos.y > p.height/2) this.vel.y *= -1;
+                if (this.pos.z < -p.width || this.pos.z > p.width) this.vel.z *= -1;
+            }
+
+            show() {
+                p.push();
+                p.translate(this.pos.x, this.pos.y, this.pos.z);
+                p.noStroke();
+                p.fill(217, 255, 0, 80);
+                p.sphere(this.size);
+                p.pop();
+            }
+        }
+        
+        let particles = [];
+
+        p.setup = function() {
+            let canvas = p.createCanvas(p.windowWidth, 400, p.WEBGL);
+            canvas.parent('dna-animation-container');
+            for(let i = 0; i < 100; i++) {
+                particles.push(new Particle());
+            }
+        };
+
+        p.draw = function() {
+            p.background(10, 10, 10);
+            p.orbitControl(2, 2, 0.1);
+
+            p.rotateY(angle);
+            
+            // Draw particles
+            for(let particle of particles) {
+                particle.update();
+                particle.show();
+            }
+
+            // Draw DNA structure
+            p.stroke(217, 255, 0, 150); // Accent color
+            p.strokeWeight(2);
+
+            let totalHeight = numRungs * rungSpacing;
+
+            // Strand 1
+            p.noFill();
+            p.beginShape();
+            for (let i = 0; i < numRungs; i++) {
+                let y = p.map(i, 0, numRungs, -totalHeight / 2, totalHeight / 2);
+                let x = radius * p.cos(p.radians(i * 15));
+                let z = radius * p.sin(p.radians(i * 15));
+                p.vertex(x, y, z);
+            }
+            p.endShape();
+
+            // Strand 2
+            p.beginShape();
+            for (let i = 0; i < numRungs; i++) {
+                let y = p.map(i, 0, numRungs, -totalHeight / 2, totalHeight / 2);
+                let x = radius * p.cos(p.radians(i * 15) + p.PI);
+                let z = radius * p.sin(p.radians(i * 15) + p.PI);
+                p.vertex(x, y, z);
+            }
+            p.endShape();
+
+            // Rungs
+            p.strokeWeight(1.5);
+             p.stroke(255, 255, 255, 100);
+            for (let i = 0; i < numRungs; i++) {
+                let y = p.map(i, 0, numRungs, -totalHeight / 2, totalHeight / 2);
+                let x1 = radius * p.cos(p.radians(i * 15));
+                let z1 = radius * p.sin(p.radians(i * 15));
+                let x2 = radius * p.cos(p.radians(i * 15) + p.PI);
+                let z2 = radius * p.sin(p.radians(i * 15) + p.PI);
+                p.line(x1, y, z1, x2, y, z2);
+            }
+            
+            angle += 0.005;
+        };
+        
+        p.windowResized = function() {
+            p.resizeCanvas(p.windowWidth, 400);
+        };
+    }
+    new p5(dnaSketch);
+
+    // Modal Interaction Script
+    const modal = document.getElementById('early-access-modal');
+    const openModalButton = document.getElementById('open-modal-button');
+    const closeModalButton = document.getElementById('close-modal-button');
+    const backdrop = document.getElementById('modal-backdrop');
+
+    openModalButton.addEventListener('click', () => modal.classList.remove('hidden'));
+    closeModalButton.addEventListener('click', () => modal.classList.add('hidden'));
+    backdrop.addEventListener('click', () => modal.classList.add('hidden'));
+
+    // Netlify Form Submission for Biotech Form
+    const biotechForm = document.querySelector('#early-access-modal form');
+    if (biotechForm) {
+        biotechForm.addEventListener('submit', e => {
+            e.preventDefault();
+
+            const formData = new FormData(biotechForm);
+            const submitButton = biotechForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.innerHTML = 'Sending...';
+            submitButton.disabled = true;
+
+            fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams(formData).toString()
+            })
+            .then(() => {
+                biotechForm.innerHTML = `<div class="text-center p-8"><h3 class="text-2xl font-bold text-[var(--brand-accent)]">Thank You!</h3><p class="text-gray-300 mt-2">Your request for early access has been received. We'll be in touch soon.</p></div>`;
+            })
+            .catch(error => {
+                alert('Sorry, there was an error sending your message. Please try again later.');
+                submitButton.innerHTML = originalButtonText;
+                submitButton.disabled = false;
+            });
+        });
+    }
+
+    </script>
+</body>
+</html> 
