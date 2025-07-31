@@ -129,6 +129,15 @@
     </style>
 </head>
 <body class="bg-grid">
+    <!-- Netlify-friendly hidden form -->
+    <form name="contact" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <input type="text" name="organization" />
+      <select name="subject"></select>
+      <textarea name="message"></textarea>
+    </form>
+
     <div id="canvas-container"></div>
 
     <!-- Header -->
